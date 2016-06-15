@@ -7,7 +7,6 @@ var mqtt = require('mqtt');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Mi5Module, EventEmitter);
-var connectionCount = 0;
  
 var OpcuaServer = simpleOpcua.OpcuaServer;
 var OpcuaClient = simpleOpcua.OpcuaClient;
@@ -44,7 +43,7 @@ function Mi5Module(trivialName, settings){
   this.behaviour = settings.behaviour;
   this.init = false;
   this.numberOfSkills = 0;
-
+  this.connectionCount = 0;
 
   // functions
 
