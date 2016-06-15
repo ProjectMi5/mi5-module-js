@@ -28,11 +28,12 @@ function Mi5Module(trivialName, settings){
   var self = this;
 
   this.trivialName = trivialName;
+  this.moduleId = settings.moduleId;
   // opcua
   this.baseNodeId = settings.opcua.baseNodeId;
   this.opcuaSettings = settings.opcua;
   this.opcuaServer = createOpcuaServer();
-	this.opcuaClient = connectToOpcuaServer();
+  this.opcuaClient = connectToOpcuaServer();
   // mqtt
   this.mqttSettings = settings.mqtt;
   this.mqttClient = connectToMQTTClient();
@@ -69,7 +70,7 @@ function Mi5Module(trivialName, settings){
       return null;
     }
 	self.log('connecting to opcua server '+JSON.stringify(opcuaSettings.hostAddress));
-    connectionCount++;
+    self.connectionCount++;
     return new OpcuaClient(opcuaSettings.hostAddress, function(err){
       if(!err)
         newConnectionEstablished();
@@ -83,7 +84,7 @@ function Mi5Module(trivialName, settings){
       return null;
     }
 	self.log('connecting to mqtt broker '+mqttSettings.hostAddress);
-    connectionCount++;
+    self.connectionCount++;
     var mqttClient = mqtt.connect(mqttSettings.hostAddress);
     mqttClient.on('connect', function(){
       self.log('connected to mqtt broker at '+mqttSettings.hostAddress);
@@ -94,8 +95,8 @@ function Mi5Module(trivialName, settings){
   }
 
   function newConnectionEstablished(){
-    connectionCount--;
-    if(connectionCount == 0){
+    self.connectionCount--;
+    if(self.connectionCount == 0){
       self.log('All connections established successfully.');
       self.emit('connect');
       self.init = true;
