@@ -11,6 +11,12 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
   this.skillNumber = SkillNumber;
   this.skillName = SkillName;
   this.Mi5Module = Mi5Module;
+
+  // settings
+  this.settings = settings;
+  if(!settings)
+    settings = {}; // set settings to object, so that existence of settigs must not always be controlled
+
   // default behaviour
   this.behaviour = {
     simulate: false,
@@ -26,15 +32,12 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
   if(Mi5Module.timers)
     this.behaviour.timers = Mi5Module.timers;
   // skill settings can override module settings
-  this.settings = settings;
-  if(settings){
-    if(typeof settings.simulateBehaviour != 'undefined')
-      this.behaviour.simulate = settings.simulateBehaviour;
-    if(settings.timers)
-      this.behaviour.timers = settings.timers;
-    this.behaviour.doneEvent = settings.doneEvent;
-    this.behaviour.listenToMqttTopic = settings.listenToMqttTopic;
-  }
+  if(typeof settings.simulateBehaviour != 'undefined')
+    this.behaviour.simulate = settings.simulateBehaviour;
+  if(settings.timers)
+    this.behaviour.timers = settings.timers;
+  this.behaviour.doneEvent = settings.doneEvent;
+  this.behaviour.listenToMqttTopic = settings.listenToMqttTopic;
 
 	var endOfBaseNodeId = Mi5Module.baseNodeId.split('').pop();
   var dot = '.';
@@ -44,6 +47,15 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
 	
 	var baseNodeIdInput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Input.SkillInput.SkillInput' + SkillNumber + '.';
 	var baseNodeIdOutput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Output.SkillOutput.SkillOutput' + SkillNumber + '.';
+
+  if(settings.skillID){
+    this.skillID = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID');
+    this.skillID.write(settings.skillID);
+    this.skillDummyValue = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy');
+    this.skillDummyValue.write(false);
+    this.skillName = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name');
+    this.skillName.write(SkillName);
+  }
 
 	this.execute	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdInput + 'Execute');
 	this.ready	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Ready');
