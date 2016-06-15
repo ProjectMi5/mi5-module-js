@@ -9,6 +9,7 @@
   "author": "dominik serve",
   "license": "MIT",
   "dependencies": {
-	"mi5-module-js": "git+https://github.com/ProjectMi5/mi5-module-js.git",
+    "mi5-module-js": "git+https://github.com/ProjectMi5/mi5-module-js.git",
+    "mi5-simple-opcua": "git+https://github.com/ProjectMi5/mi5-simple-opcua.git"
   }
 }
