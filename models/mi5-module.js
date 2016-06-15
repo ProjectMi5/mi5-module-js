@@ -71,7 +71,9 @@ function Mi5Module(trivialName, settings){
     }
 	self.log('connecting to opcua server '+JSON.stringify(opcuaSettings.hostAddress));
     self.connectionCount++;
+    console.log(self.connectionCount);
     return new OpcuaClient(opcuaSettings.hostAddress, function(err){
+      self.log('connected to opcua server'+err);
       if(!err)
         newConnectionEstablished();
     });
