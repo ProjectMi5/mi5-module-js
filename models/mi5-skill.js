@@ -10,6 +10,7 @@ function Skill(SkillNumber, SkillName, Mi5Module){
   var self = this;
   this.skillNumber = SkillNumber;
   this.skillName = SkillName;
+  this.Mi5Module = Mi5Module;
 
 	var endOfBaseNodeId = Mi5Module.baseNodeId.split('').pop();
   var dot = '.';
@@ -26,8 +27,8 @@ function Skill(SkillNumber, SkillName, Mi5Module){
 	this.done	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Done');
 	this.error    =  new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Error');
 
-  if(Mi5Module.simulate){
-    this.execute.onChange(function(value){
+  if(Mi5Module.simulateBehaviour){
+    self.execute.onChange(function(value){
       console.log('Skill'+self.skillNumber+', '+self.skillName+': execute ' + value);
       var timers = {
         finishTask: 2000,
@@ -51,17 +52,22 @@ function Skill(SkillNumber, SkillName, Mi5Module){
       }
     });
 
-    this.error.onChange(function(value){
-      console.log('Skill'+self.skillNumber+', '+self.skillName+': error ' + value);
+    self.error.onChange(function(value){
+      self.log('error ' + value);
       self.setError(value);
     });
   }
 }
 
+Skill.prototype.log = function(message){
+  var self = this;
+  console.log(self.Mi5Module.trivialName + ': Skill ' + self.skillNumber+', '+self.skillName + ': ' + message);
+};
+
 
 Skill.prototype.setBusy = function(){
   var self = this;
-  console.log('Skill'+self.skillNumber+', '+self.skillName+': set busy.');
+  self.log('set busy.');
   self.done.write(false);
   self.busy.write(true);
   self.ready.write(false);
@@ -72,21 +78,21 @@ Skill.prototype.setBusy = function(){
 
 Skill.prototype.finishTask = function(){
   var self = this;
-  console.log('Skill'+self.skillNumber+', '+self.skillName+': finished its task.');
+  self.log('finished its task.');
   self.busy.write(false);
   //writeToIndPhysix("status_self.busy","FALSE");
 };
 
 Skill.prototype.setDone = function(){
   var self = this;
-  console.log('Skill'+self.skillNumber+', '+self.skillName+': set done.');
+  self.log('set done.');
   self.done.write(true);
   //writeToIndPhysix("status_self.done","TRUE");
 };
 
 Skill.prototype.setReady = function(){
   var self = this;
-  console.log('Skill'+self.skillNumber+', '+self.skillName+': set ready.');
+  self.log('set ready.');
   self.busy.write(false);
   self.ready.write(true);
   self.done.write(false);
@@ -109,7 +115,7 @@ Skill.prototype.setError = function(value){
   // SkillNumber+1 equals pump number for Cocktail Module
   var outputString = 'setIOValue("' + indPhysxSkillPath + '","' + variableName + '","' + value + '");';
   Mi5Module.indPhysxClient.write(outputString);
-  //console.log(outputString);
+  //self.log(outputString);
 }*/
 
 module.exports = Skill;

@@ -2,7 +2,7 @@
  * Created by Dominik on 15.06.2016.
  */
 
-var Mi5Module = require('mi5-module').Mi5Module;
+var Mi5Module = require('./../models/mi5-module');
 var config = require('./config');
 
 var moduleSettings = {
@@ -23,6 +23,6 @@ var moduleSettings = {
 var TestModule = new Mi5Module('test module', moduleSettings);
 TestModule.on('connect', function(){
   console.log('received event.');
-  var Mi5Skill = require('mi5-module').Mi5Skill;
-  var TestSkill = new Mi5Skill(0, 'TestSkill', TestModule);
+  var Mi5Skill = require('./../models/mi5-skill');
+  var TestSkill = new Mi5Skill(0, 'Super Skill', TestModule);
 });

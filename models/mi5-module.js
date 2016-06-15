@@ -38,7 +38,7 @@ function Mi5Module(trivialName, settings){
   // indPhysx
   this.indPhysxSettings = settings.indPhysx;
   // else
-  this.simulateBehaviour = settings.simulateBehavior;
+  this.simulateBehaviour = settings.simulateBehaviour;
   this.behaviour = settings.behaviour;
 
 
