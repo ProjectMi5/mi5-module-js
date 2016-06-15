@@ -26,30 +26,36 @@ function Skill(SkillNumber, SkillName, Mi5Module){
 	this.done	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Done');
 	this.error    =  new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Error');
 
+  if(Mi5Module.simulate){
+    this.execute.onChange(function(value){
+      console.log('Skill'+self.skillNumber+', '+self.skillName+': execute ' + value);
+      var timers = {
+        finishTask: 2000,
+        setDone: 3000,
+        setReady: 4000
+      };
+      if(Mi5Module.behavior){
+        timers = Mi5Module.behavior;
+      }
+      if(value){
+        self.setBusy();
+        setTimeout(function(){
+          self.finishTask();
+        },timers.finishTask);
+        setTimeout(function(){
+          self.setDone()
+        },timers.setDone);
+        setTimeout(function(){
+          self.setReady()
+        },timers.setReady);
+      }
+    });
 
-	this.execute.onChange(function(value){
-		console.log('Skill'+self.skillNumber+', '+self.skillName+': execute ' + value);
-		if(value){
-			self.setBusy();
-			setTimeout(function(){
-        self.finishTask();
-      },2000);
-			setTimeout(function(){
-        self.setDone()
-      },3000);
-			setTimeout(function(){
-        self.setReady()
-      },4000);
-		}
-	});
-	
-	this.error.onChange(function(value){
-		console.log('Skill'+self.skillNumber+', '+self.skillName+': error ' + value);
-		self.setError(value);
-	});
-		
-
-	
+    this.error.onChange(function(value){
+      console.log('Skill'+self.skillNumber+', '+self.skillName+': error ' + value);
+      self.setError(value);
+    });
+  }
 }
 
 

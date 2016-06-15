@@ -37,6 +37,9 @@ function Mi5Module(trivialName, settings){
   this.mqttClient = connectToMQTTClient();
   // indPhysx
   this.indPhysxSettings = settings.indPhysx;
+  // else
+  this.simulateBehaviour = settings.simulateBehavior;
+  this.behaviour = settings.behaviour;
 
 
   // functions

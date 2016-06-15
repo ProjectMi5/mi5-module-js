@@ -11,6 +11,12 @@ var moduleSettings = {
   },
   opcua: {
     server: config.ServerStructure
+  },
+  simulateBehaviour: true,
+  behaviour: {
+    finishTask: 2000,
+    setDone: 3000,
+    setReady: 4000
   }
 };
 
