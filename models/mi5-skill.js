@@ -49,12 +49,12 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
 	var baseNodeIdOutput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Output.SkillOutput.SkillOutput' + SkillNumber + '.';
 
   if(settings.skillID){
-    this.skillID = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID');
-    this.skillID.write(settings.skillID);
+    this.skillIDVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID');
+    this.skillIDVariable.write(settings.skillID);
     this.skillDummyValue = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy');
     this.skillDummyValue.write(false);
-    this.skillName = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name');
-    this.skillName.write(SkillName);
+    this.skillNameVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name');
+    this.skillNameVariable.write(SkillName);
   }
 
 	this.execute	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdInput + 'Execute');
