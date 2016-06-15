@@ -1,0 +1,27 @@
+{
+  "name": "mi5-module",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dominik serve",
+  "license": "MIT",
+  "dependencies": {
+    "mi5-simple-opcua": "git+https://github.com/ProjectMi5/mi5-simple-opcua.git",
+    "mqtt": "^1.11.0"
+  },
+  "directories": {
+    "example": "example",
+	"models": "models"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProjectMi5/mi5-module-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ProjectMi5/mi5-module-js/issues"
+  },
+  "homepage": "https://github.com/ProjectMi5/mi5-module-js#readme",
+  "description": ""
+}
