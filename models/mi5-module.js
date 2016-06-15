@@ -66,10 +66,10 @@ function Mi5Module(trivialName, settings){
 
   function connectToOpcuaServer(){
     var opcuaSettings = self.opcuaSettings;
-    console.log('connect to opcua server '+JSON.stringify(opcuaSettings.hostAddress));
     if(!opcuaSettings){
       return null;
     }
+	self.log('connecting to opcua server '+JSON.stringify(opcuaSettings.hostAddress));
     connectionCount++;
     return new OpcuaClient(opcuaSettings.hostAddress, function(err){
       if(!err)
@@ -79,14 +79,15 @@ function Mi5Module(trivialName, settings){
 
   function connectToMQTTClient(){
     var mqttSettings = self.mqttSettings;
-    console.log('connect to mqtt broker '+JSON.stringify(mqttSettings));
+   
     if(!mqttSettings){
       return null;
     }
+	self.log('connecting to mqtt broker '+mqttSettings.hostAddress);
     connectionCount++;
     var mqttClient = mqtt.connect(mqttSettings.hostAddress);
     mqttClient.on('connect', function(){
-      console.log('connected to mqtt broker.');
+      self.log('connected to mqtt broker at '+mqttSettings.hostAddress);
       newConnectionEstablished();
     });
     mqttClient.on('error', console.log);
@@ -96,7 +97,7 @@ function Mi5Module(trivialName, settings){
   function newConnectionEstablished(){
     connectionCount--;
     if(connectionCount == 0){
-      console.log('All connections established successfully.');
+      self.log('All connections established successfully.');
       self.emit('connect');
       self.init = true;
     }
@@ -114,6 +115,11 @@ Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, settings){
     var skill = new mi5Skill(SkillNumber, SkillName, self, settings);
     this[SkillName] = skill
   }
+};
+
+Mi5Module.prototype.log = function(message){
+  var self = this;
+  console.log('Module: ' + self.trivialName + ': ' + message);
 };
 
 module.exports = Mi5Module;
