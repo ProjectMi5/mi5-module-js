@@ -11,6 +11,8 @@ var connectionCount = 0;
  
 var OpcuaServer = simpleOpcua.OpcuaServer;
 var OpcuaClient = simpleOpcua.OpcuaClient;
+
+var mi5Skill = require('./mi5-skill');
 //var OpcuaVariable = simpleOpcua.OpcuaVariable;
 
 
@@ -96,10 +98,11 @@ function Mi5Module(trivialName, settings){
       self.emit('connect');
     }
   }
-
 }
 
-
-
+Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, settings){
+  var self = this;
+  this[SkillName] = new mi5Skill(SkillNumber, SkillName, self, settings);
+};
 
 module.exports = Mi5Module;
