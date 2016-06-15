@@ -4,13 +4,37 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Skill, EventEmitter);
 
-function Skill(SkillNumber, SkillName, Mi5Module){
+function Skill(SkillNumber, SkillName, Mi5Module, settings){
   console.log('Skill init '+ SkillNumber + ' ' + SkillName);
   EventEmitter.call(this);
   var self = this;
   this.skillNumber = SkillNumber;
   this.skillName = SkillName;
   this.Mi5Module = Mi5Module;
+  // default behaviour
+  this.behaviour = {
+    simulate: false,
+    timers: {
+      finishTask: 2000,
+      setDone: 3000,
+      setReady: 4000
+    }
+  };
+  // module settings can override default behaviour
+  if(Mi5Module.simulateBehaviour)
+    this.behaviour.simulate = Mi5Module.simulateBehaviour;
+  if(Mi5Module.timers)
+    this.behaviour.timers = Mi5Module.timers;
+  // skill settings can override module settings
+  this.settings = settings;
+  if(settings){
+    if(typeof settings.simulateBehaviour != 'undefined')
+      this.behaviour.simulate = settings.simulateBehaviour;
+    if(settings.timers)
+      this.behaviour.timers = settings.timers;
+    this.behaviour.doneEvent = settings.doneEvent;
+    this.behaviour.listenToMqttTopic = settings.listenToMqttTopic;
+  }
 
 	var endOfBaseNodeId = Mi5Module.baseNodeId.split('').pop();
   var dot = '.';
@@ -27,28 +51,12 @@ function Skill(SkillNumber, SkillName, Mi5Module){
 	this.done	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Done');
 	this.error    =  new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Error');
 
-  if(Mi5Module.simulateBehaviour){
+  if(this.behaviour.simulate){
     self.execute.onChange(function(value){
       console.log('Skill'+self.skillNumber+', '+self.skillName+': execute ' + value);
-      var timers = {
-        finishTask: 2000,
-        setDone: 3000,
-        setReady: 4000
-      };
-      if(Mi5Module.behavior){
-        timers = Mi5Module.behavior;
-      }
+
       if(value){
-        self.setBusy();
-        setTimeout(function(){
-          self.finishTask();
-        },timers.finishTask);
-        setTimeout(function(){
-          self.setDone()
-        },timers.setDone);
-        setTimeout(function(){
-          self.setReady()
-        },timers.setReady);
+        self.simulateBehaviour(self.behaviour.timers, self.behaviour.doneEvent);
       }
     });
 
@@ -57,7 +65,57 @@ function Skill(SkillNumber, SkillName, Mi5Module){
       self.setError(value);
     });
   }
+
+  if(this.behaviour.listenToMqttTopic){
+    Mi5Module.mqttClient.subscribe(self.behaviour.listenToMqttTopic);
+    self.mqttSensor = false;
+    Mi5Module.mqttClient.on('message', function (topic, message) {
+      // message is Buffer
+      if(topic != self.behaviour.listenToMqttTopic)
+        return;
+      message = message.toString();
+      self.log('sensor says: '+message);
+      var newValue = JSON.parse(message);
+      if(self.mqttSensor != newValue){
+        self.log('new value');
+        if(newValue){
+          self.emit('mqttSensorTurnedTrue');
+        } else {
+          self.emit('mqttSensorTurnedFalse');
+        }
+      }
+      self.sensor = newValue;
+    });
+  }
 }
+
+Skill.prototype.simulateBehaviour = function(timers, doneEvent){
+  var self = this;
+  self.setBusy();
+  if(self.behaviour.listenToMqttTopic){
+    if(self.mqttSensor)
+      runThroughStates();
+    else
+      self.once('mqttSensorTurnedTrue', runThroughStates);
+  }
+  else if(self.behaviour.doneEvent){
+    self.once(doneEvent, runThroughStates);
+  } else {
+    runThroughStates();
+  }
+
+  function runThroughStates(){
+    setTimeout(function(){
+      self.finishTask();
+    },timers.finishTask);
+    setTimeout(function(){
+      self.setDone()
+    },timers.setDone);
+    setTimeout(function(){
+      self.setReady()
+    },timers.setReady);
+  }
+};
 
 Skill.prototype.log = function(message){
   var self = this;

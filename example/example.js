@@ -24,5 +24,5 @@ var TestModule = new Mi5Module('test module', moduleSettings);
 TestModule.on('connect', function(){
   console.log('received event.');
   var Mi5Skill = require('./../models/mi5-skill');
-  var TestSkill = new Mi5Skill(0, 'Super Skill', TestModule);
+  var TestSkill = new Mi5Skill(0, 'Super Skill', TestModule, {listenToMqttTopic: 'test/hello'});
 });
