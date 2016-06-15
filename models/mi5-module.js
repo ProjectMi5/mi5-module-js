@@ -119,7 +119,7 @@ Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, settings){
 
 Mi5Module.prototype.log = function(message){
   var self = this;
-  console.log('Module: ' + self.trivialName + ': ' + message);
+  console.log('Module ' + self.trivialName + ': ' + message);
 };
 
 module.exports = Mi5Module;
