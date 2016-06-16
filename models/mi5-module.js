@@ -7,6 +7,7 @@ var mqtt = require('mqtt');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Mi5Module, EventEmitter);
+var winston = require('winston');
  
 var OpcuaServer = simpleOpcua.OpcuaServer;
 var OpcuaClient = simpleOpcua.OpcuaClient;
@@ -23,14 +24,17 @@ var mi5Skill = require('./mi5-skill');
  */
 
 function Mi5Module(trivialName, settings){
-  console.log('creating new module '+trivialName);
+  //console.log(trivialName, 'creating new module');
   EventEmitter.call(this);
   var self = this;
+  var item = this;
 
+  item.numberOfConnections = 0;
   this.trivialName = trivialName;
   this.moduleId = settings.moduleId;
   // opcua
-  this.baseNodeId = settings.opcua.baseNodeId;
+  if(settings.opcua)
+    this.baseNodeId = settings.opcua.baseNodeId;
   this.opcuaSettings = settings.opcua;
   this.opcuaServer = createOpcuaServer();
   this.opcuaClient = connectToOpcuaServer();
@@ -44,12 +48,11 @@ function Mi5Module(trivialName, settings){
   this.behaviour = settings.behaviour;
   this.init = false;
   this.numberOfSkills = 0;
-  this.connectionCount = 0;
 
   // functions
 
   function createOpcuaServer(){
-    var opcuaSettings = self.opcuaSettings;
+    var opcuaSettings = item.opcuaSettings;
     if(!opcuaSettings){
       return null;
     }
@@ -69,13 +72,14 @@ function Mi5Module(trivialName, settings){
     if(!opcuaSettings){
       return null;
     }
-	self.log('connecting to opcua server '+JSON.stringify(opcuaSettings.hostAddress));
-    self.connectionCount++;
-    console.log(self.connectionCount);
+	  //self.log('connecting to opcua server '+JSON.stringify(opcuaSettings.hostAddress));
+    item.numberOfConnections++;
     return new OpcuaClient(opcuaSettings.hostAddress, function(err){
-      self.log('connected to opcua server'+err);
-      if(!err)
+      self.log('connected to opcua server');
+      if(!err){
         newConnectionEstablished();
+      }
+
     });
   }
 
@@ -86,7 +90,7 @@ function Mi5Module(trivialName, settings){
       return null;
     }
 	self.log('connecting to mqtt broker '+mqttSettings.hostAddress);
-    self.connectionCount++;
+    item.numberOfConnections++;
     var mqttClient = mqtt.connect(mqttSettings.hostAddress);
     mqttClient.on('connect', function(){
       self.log('connected to mqtt broker at '+mqttSettings.hostAddress);
@@ -97,8 +101,8 @@ function Mi5Module(trivialName, settings){
   }
 
   function newConnectionEstablished(){
-    self.connectionCount--;
-    if(self.connectionCount == 0){
+    item.numberOfConnections--;
+    if(item.numberOfConnections == 0){
       self.log('All connections established successfully.');
       self.emit('connect');
       self.init = true;
@@ -121,7 +125,7 @@ Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, settings){
 
 Mi5Module.prototype.log = function(message){
   var self = this;
-  console.log('Module ' + self.trivialName + ': ' + message);
+  console.log(self.trivialName, message);
 };
 
 module.exports = Mi5Module;
