@@ -7,7 +7,6 @@ var mqtt = require('mqtt');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Mi5Module, EventEmitter);
-var winston = require('winston');
  
 var OpcuaServer = simpleOpcua.OpcuaServer;
 var OpcuaClient = simpleOpcua.OpcuaClient;
