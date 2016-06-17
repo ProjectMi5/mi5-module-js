@@ -10,6 +10,7 @@ util.inherits(Mi5Module, EventEmitter);
  
 var OpcuaServer = simpleOpcua.OpcuaServer;
 var OpcuaClient = simpleOpcua.OpcuaClient;
+var OpcuaHelper = simpleOpcua.helper;
 
 var mi5Skill = require('./mi5-skill');
 //var OpcuaVariable = simpleOpcua.OpcuaVariable;
@@ -58,10 +59,26 @@ function Mi5Module(trivialName, settings){
     if(!opcuaSettings.server){
       return null;
     }
-    // creating host ip
+    var serverStructure = opcuaSettings.server;
+
+    // make host address available for client
     opcuaSettings.hostAddress = "opc.tcp://" + require("os").hostname() + ":" + opcuaSettings.server.serverInfo.port;
+
+    // adobt baseNodeId and moduleName for skills etc.
     self.baseNodeId = opcuaSettings.server.baseNodeId;
     self.moduleName = opcuaSettings.server.moduleName;
+
+    // finish opcua server structure
+    if(opcuaSettings.expandRepeatUnits){
+      var expandFolderStructure = OpcuaHelper.expandFolderStructure;
+      serverStructure.content = expandFolderStructure(folderStructure);
+    }
+    if(opcuaSettings.setInitValues){
+      var setInitValues = OpcuaHelper.setInitValues;
+      var initValueStatements = opcuaSettings.setInitValues;
+      serverStructure.content = setInitValues(serverStructure.content, initValueStatements);
+    }
+
     // starting server
     return OpcuaServer.newOpcuaServer(opcuaSettings.server);
   }
