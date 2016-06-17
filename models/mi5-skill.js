@@ -22,8 +22,7 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
     simulate: false,
     timers: {
       finishTask: 2000,
-      setDone: 3000,
-      setReady: 4000
+      setDone: 3000
     }
   };
   // module settings can override default behaviour
@@ -69,7 +68,9 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
 
       if(value){
         self.simulateBehaviour(self.behaviour.timers, self.behaviour.doneEvent);
-      }
+      } else {
+		self.setReady();
+	  }
     });
 
     self.error.onChange(function(value){
@@ -123,9 +124,12 @@ Skill.prototype.simulateBehaviour = function(timers, doneEvent){
     setTimeout(function(){
       self.setDone()
     },timers.setDone);
-    setTimeout(function(){
-      self.setReady()
-    },timers.setReady);
+	if(timers.setReady){
+		setTimeout(function(){
+		  self.setReady()
+		},timers.setReady);
+	}
+
   }
 };
 
