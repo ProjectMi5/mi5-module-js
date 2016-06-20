@@ -7,7 +7,7 @@ var mqtt = require('mqtt');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Mi5Module, EventEmitter);
- 
+
 var OpcuaServer = simpleOpcua.OpcuaServer;
 var OpcuaClient = simpleOpcua.OpcuaClient;
 var OpcuaHelper = simpleOpcua.helper;
@@ -71,12 +71,12 @@ function Mi5Module(trivialName, settings){
     // finish opcua server structure
     if(opcuaSettings.expandRepeatUnits){
       var expandFolderStructure = OpcuaHelper.expandFolderStructure;
-      serverStructure.content = expandFolderStructure(folderStructure);
+      serverStructure.content = expandFolderStructure(serverStructure.content);
     }
     if(opcuaSettings.setInitValues){
       var setInitValues = OpcuaHelper.setInitValues;
       var initValueStatements = opcuaSettings.setInitValues;
-      serverStructure.content = setInitValues(serverStructure.content, initValueStatements);
+      opcuaSettings.server.content = setInitValues(serverStructure.content, initValueStatements);
     }
 
     // starting server
@@ -88,7 +88,7 @@ function Mi5Module(trivialName, settings){
     if(!opcuaSettings){
       return null;
     }
-	  //self.log('connecting to opcua server '+JSON.stringify(opcuaSettings.hostAddress));
+    //self.log('connecting to opcua server '+JSON.stringify(opcuaSettings.hostAddress));
     item.numberOfConnections++;
     return new OpcuaClient(opcuaSettings.hostAddress, function(err){
       self.log('connected to opcua server');
@@ -101,11 +101,11 @@ function Mi5Module(trivialName, settings){
 
   function connectToMQTTClient(){
     var mqttSettings = self.mqttSettings;
-   
+
     if(!mqttSettings){
       return null;
     }
-	self.log('connecting to mqtt broker '+mqttSettings.hostAddress);
+    self.log('connecting to mqtt broker '+mqttSettings.hostAddress);
     item.numberOfConnections++;
     var mqttClient = mqtt.connect(mqttSettings.hostAddress);
     mqttClient.on('connect', function(){
