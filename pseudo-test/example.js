@@ -15,8 +15,7 @@ var moduleSettings = {
   simulateBehaviour: true,
   behaviour: {
     finishTask: 2000,
-    setDone: 3000,
-    setReady: 4000
+    setDone: 3000
   }
 };
 
@@ -25,4 +24,4 @@ TestModule.on('connect', function(){
   // 
 });
 
-TestModule.createSkill(0, 'Super Super Skill', {listenToMqttTopic: 'test/hello', skillID: 2233});
+TestModule.createSkill(0, 'Orange Juice', 2233, {simulateBehaviour:true});

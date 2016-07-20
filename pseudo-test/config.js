@@ -2,12 +2,6 @@ var ModuleID = '1202';
 
 var folderStructure = require('./folderStructure.json');
 
-var helper = require('mi5-simple-opcua').helper;
-var expandFolderStructure = helper.expandFolderStructure;
-var setInitValues = helper.setInitValues;
-
-folderStructure = expandFolderStructure(folderStructure);
-
 exports.mqtt = {
 	host: 'tcp://mi5.itq.de',
 	topics: {
@@ -24,26 +18,9 @@ var valueStatements = [
 {
 	path: 'Output.ID',
 	initValue: ModuleID
-},
-{
-	path: 'Output.SkillOutput.SkillOutput0.Dummy',
-	initValue: false
-},
-{
-	path: 'Output.SkillOutput.SkillOutput0.ID',
-	initValue: 5010
-},
-{
-	path: 'Output.SkillOutput.SkillOutput1.Dummy',
-	initValue: false
-},
-{
-	path: 'Output.SkillOutput.SkillOutput1.ID',
-	initValue: 5011
 }
 ];
 
-folderStructure = setInitValues(folderStructure, valueStatements);
 
 var ServerStructure = {
 	moduleName: 'Module'+ModuleID,
