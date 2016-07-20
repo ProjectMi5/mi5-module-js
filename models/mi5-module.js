@@ -8,6 +8,8 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Mi5Module, EventEmitter);
 
+var debug = require('debug');
+
 var OpcuaServer = simpleOpcua.OpcuaServer;
 var OpcuaClient = simpleOpcua.OpcuaClient;
 var OpcuaHelper = simpleOpcua.helper;
@@ -28,6 +30,8 @@ function Mi5Module(trivialName, settings){
   EventEmitter.call(this);
   var self = this;
   var item = this;
+
+  this.debug = debug(trivialName);
 
   item.numberOfConnections = 0;
   this.trivialName = trivialName;
@@ -69,7 +73,7 @@ function Mi5Module(trivialName, settings){
     self.moduleName = opcuaSettings.server.moduleName;
 
     // finish opcua server structure
-    if(opcuaSettings.expandRepeatUnits){
+    if(typeof opcuaSettings.expandRepeatUnits == 'undefined' || opcuaSettings.expandRepeatUnits == true){
       var expandFolderStructure = OpcuaHelper.expandFolderStructure;
       serverStructure.content = expandFolderStructure(serverStructure.content);
     }
@@ -126,7 +130,7 @@ function Mi5Module(trivialName, settings){
   }
 }
 
-Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, settings){
+Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, SkillId, settings){
   var self = this;
   if(self.init)
     append();
@@ -134,14 +138,13 @@ Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, settings){
     self.once('connect', append);
 
   function append(){
-    var skill = new mi5Skill(SkillNumber, SkillName, self, settings);
+    var skill = new mi5Skill(SkillNumber, SkillName, SkillId, self, settings);
     this[SkillName] = skill
   }
 };
 
 Mi5Module.prototype.log = function(message){
-  var self = this;
-  console.log(self.trivialName, message);
+  this.debug(message);
 };
 
 module.exports = Mi5Module;

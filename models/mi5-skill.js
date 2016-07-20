@@ -4,12 +4,16 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Skill, EventEmitter);
 
-function Skill(SkillNumber, SkillName, Mi5Module, settings){
-  console.log('Skill init '+ SkillNumber + ' ' + SkillName);
+const debug = require('debug');
+
+function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
+  this.debug = debug('Mi5Module:'+Mi5Module.trivialName + ':'+ SkillName);
+  this.debug('initializing. SkillNumber: '+ SkillNumber + ' SkillID: ' + SkillID);
   EventEmitter.call(this);
   var self = this;
-  this.skillNumber = SkillNumber;
-  this.skillName = SkillName;
+  this.SkillNumber = SkillNumber;
+  this.SkillName = SkillName;
+  this.SkillID = SkillID;
   this.Mi5Module = Mi5Module;
 
   // settings
@@ -30,7 +34,7 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
     this.behaviour.simulate = Mi5Module.simulateBehaviour;
   if(Mi5Module.timers)
     this.behaviour.timers = Mi5Module.timers;
-  // skill settings can override module settings
+  // Skill settings can override module settings
   if(typeof settings.simulateBehaviour != 'undefined')
     this.behaviour.simulate = settings.simulateBehaviour;
   if(settings.timers)
@@ -47,13 +51,15 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
 	var baseNodeIdInput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Input.SkillInput.SkillInput' + SkillNumber + '.';
 	var baseNodeIdOutput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Output.SkillOutput.SkillOutput' + SkillNumber + '.';
 
-  if(settings.skillID){
-    this.skillIDVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID');
-    this.skillIDVariable.write(settings.skillID);
-    this.skillDummyValue = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy');
-    this.skillDummyValue.write(false);
-    this.skillNameVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name');
-    this.skillNameVariable.write(SkillName);
+  if(SkillID){
+    this.SkillIDVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID');
+    this.SkillIDVariable.write(SkillID);
+    this.SkillDummyValue = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy');
+    this.SkillDummyValue.write(false);
+    this.SkillNameVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name');
+    this.SkillNameVariable.write(SkillName);
+  } else {
+    console.error('This Skill needs an ID.');
   }
 
 	this.execute	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdInput + 'Execute');
@@ -64,13 +70,11 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
 
   if(this.behaviour.simulate){
     self.execute.onChange(function(value){
-      console.log('Skill'+self.skillNumber+', '+self.skillName+': execute ' + value);
+      self.log('execute ' + value);
 
       if(value){
         self.simulateBehaviour(self.behaviour.timers, self.behaviour.doneEvent);
-      } else {
-		self.setReady();
-	  }
+      }
     });
 
     self.error.onChange(function(value){
@@ -104,6 +108,11 @@ function Skill(SkillNumber, SkillName, Mi5Module, settings){
 
 Skill.prototype.simulateBehaviour = function(timers, doneEvent){
   var self = this;
+  if(!self.ready.value){
+    self.log(self.ready.value);
+    self.log('Not ready. Try again.');
+    return;
+  }
   self.setBusy();
   if(self.behaviour.listenToMqttTopic){
     if(self.mqttSensor)
@@ -128,14 +137,17 @@ Skill.prototype.simulateBehaviour = function(timers, doneEvent){
 		setTimeout(function(){
 		  self.setReady()
 		},timers.setReady);
-	}
+	} else {
+    setTimeout(function(){
+      self.setReadyWhenExecuteIsReset();
+    }, timers.setDone);
+  }
 
   }
 };
 
 Skill.prototype.log = function(message){
-  var self = this;
-  console.log(self.Mi5Module.trivialName + ': Skill ' + self.skillNumber+', '+self.skillName + ': ' + message);
+  this.debug(message);
 };
 
 
@@ -162,6 +174,17 @@ Skill.prototype.setDone = function(){
   self.log('set done.');
   self.done.write(true);
   //writeToIndPhysix("status_self.done","TRUE");
+};
+
+Skill.prototype.setReadyWhenExecuteIsReset = function(){
+  var self = this;
+  self.execute.oneChange(function(value){
+    if(!value){
+      self.setReady();
+    } else {
+      self.setReadyWhenExecuteIsReset();
+    }
+  });
 };
 
 Skill.prototype.setReady = function(){
