@@ -2,7 +2,7 @@ var OpcuaVariable = require('mi5-simple-opcua').OpcuaVariable;
 
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
-util.inherits(Skill, EventEmitter);
+util.inherits(Parameter, EventEmitter);
 
 const debug = require('debug');
 
@@ -19,8 +19,8 @@ function Parameter(Position, Name, Skill, settings){
   if(!settings)
     settings = {}; // set settings to object, so that existence of settigs must not always be controlled
 
-  var baseNodeIdInput = Skill.baseNodeIdInput + '.ParameterInput.ParameterInput' + Position + '.';
-  var baseNodeIdOutput = Skill.baseNodeIdOutput + '.ParameterOutput.ParameterOutput' + Position + '.';
+  var baseNodeIdInput = Skill.baseNodeIdInput + 'ParameterInput.ParameterInput' + Position + '.';
+  var baseNodeIdOutput = Skill.baseNodeIdOutput + 'ParameterOutput.ParameterOutput' + Position + '.';
 
   //name
   this.Name = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Name', false, Name);

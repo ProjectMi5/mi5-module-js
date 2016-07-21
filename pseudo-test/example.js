@@ -24,4 +24,4 @@ TestModule.on('connect', function(){
   // 
 });
 
-TestModule.createSkill(0, 'Orange Juice', 2233, {simulateBehaviour:true});
+TestModule.createSkill(0, 'Orange Juice', 2233, {simulateBehaviour:true, parameters: [{Name: "TestParameter", settings:{ID: 3456}}]});

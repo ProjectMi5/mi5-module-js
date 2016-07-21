@@ -1,5 +1,5 @@
 var OpcuaVariable = require('mi5-simple-opcua').OpcuaVariable;
-var SkillParameter = reqire('./mi5-skill-parameter');
+var SkillParameter = require('./mi5-skill-parameter');
 
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
