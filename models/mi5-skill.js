@@ -1,4 +1,5 @@
 var OpcuaVariable = require('mi5-simple-opcua').OpcuaVariable;
+var SkillParameter = reqire('./mi5-skill-parameter');
 
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
@@ -17,9 +18,9 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
   this.Mi5Module = Mi5Module;
 
   // settings
-  this.settings = settings;
   if(!settings)
     settings = {}; // set settings to object, so that existence of settigs must not always be controlled
+  this.settings = settings;
 
   // default behaviour
   this.behaviour = {
@@ -29,11 +30,13 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
       setDone: 3000
     }
   };
+
   // module settings can override default behaviour
   if(Mi5Module.simulateBehaviour)
     this.behaviour.simulate = Mi5Module.simulateBehaviour;
   if(Mi5Module.timers)
     this.behaviour.timers = Mi5Module.timers;
+
   // Skill settings can override module settings
   if(typeof settings.simulateBehaviour != 'undefined')
     this.behaviour.simulate = settings.simulateBehaviour;
@@ -42,6 +45,7 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
   this.behaviour.doneEvent = settings.doneEvent;
   this.behaviour.listenToMqttTopic = settings.listenToMqttTopic;
 
+  //baseNodeId handling
 	var endOfBaseNodeId = Mi5Module.baseNodeId.split('').pop();
   var dot = '.';
   if(endOfBaseNodeId === '.'){
@@ -49,25 +53,38 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
   }
 	
 	var baseNodeIdInput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Input.SkillInput.SkillInput' + SkillNumber + '.';
+  this.baseNodeIdInput = baseNodeIdInput;
 	var baseNodeIdOutput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Output.SkillOutput.SkillOutput' + SkillNumber + '.';
+  this.baseNodeIdOutput = baseNodeIdOutput;
 
+  // adding skill to opcua server
   if(SkillID){
-    this.SkillIDVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID');
-    this.SkillIDVariable.write(SkillID);
-    this.SkillDummyValue = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy');
-    this.SkillDummyValue.write(false);
-    this.SkillNameVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name');
-    this.SkillNameVariable.write(SkillName);
+    this.SkillIDVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID', false, SkillID);
+    this.SkillDummyValue = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy', false, false);
+    this.SkillNameVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name', false, SkillName);
   } else {
     console.error('This Skill needs an ID.');
   }
 
+  // adding skill state variables
 	this.execute	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdInput + 'Execute');
 	this.ready	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Ready');
 	this.busy	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Busy');
 	this.done	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Done');
 	this.error    =  new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Error');
 
+  // adding parameters
+  if(settings.parameters){
+    self.parameter = {};
+    settings.parameters.forEach(function(item, index, array){
+      if(item.Position)
+        index = item.Position;
+      self.parameter[item.Name] = new SkillParameter(index, item.Name, self, item.settings);
+    });
+  }
+
+
+  // implement behaviour
   if(this.behaviour.simulate){
     self.execute.onChange(function(value){
       self.log('execute ' + value);
@@ -196,6 +213,16 @@ Skill.prototype.setReady = function(){
   /*writeToIndPhysix("status_self.busy","FALSE");
   writeToIndPhysix("status_self.ready","TRUE");
   writeToIndPhysix("status_self.done","FALSE");*/
+};
+
+Skill.prototype.setError = function(value){
+  var self = this;
+  if(value){
+    //writeToIndPhysix("status_self.error","TRUE");
+  }
+  else {
+    //writeToIndPhysix("status_self.error","FALSE");
+  }
 };
 
 Skill.prototype.setError = function(value){
