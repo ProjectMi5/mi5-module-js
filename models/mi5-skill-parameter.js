@@ -63,7 +63,7 @@ function Parameter(Position, Name, Skill, settings){
 
     // input
     self.StringValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdInput + 'StringValue', true);
-    self.StringValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdInput + 'Value', true);
+    self.Value = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdInput + 'Value', true);
 
     self.initialized = true;
     self.emit('init');
