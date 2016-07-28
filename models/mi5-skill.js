@@ -256,6 +256,16 @@ Skill.prototype.setError = function(value){
   }
 };
 
+Skill.prototype.activate = function(value){
+  var self = this;
+  if(value){
+    self.emit('activate');
+  } else {
+    self.emit('deactivate');
+  }
+  this.activated.write(value);
+}
+
 Skill.prototype.addParameter = function(index, name, settings){
   var self = this;
   var parameter = new SkillParameter(index, name, self, settings);
