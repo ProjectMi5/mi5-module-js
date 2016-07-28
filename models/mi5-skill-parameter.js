@@ -14,6 +14,7 @@ function Parameter(Position, Name, Skill, settings){
   var self = this;
   this.Position = Position;
   this.Skill = Skill;
+  this.initialized = false;
 
   // settings
   if(!settings)
@@ -22,40 +23,51 @@ function Parameter(Position, Name, Skill, settings){
   var baseNodeIdInput = Skill.baseNodeIdInput + 'ParameterInput.ParameterInput' + Position + '.';
   var baseNodeIdOutput = Skill.baseNodeIdOutput + 'ParameterOutput.ParameterOutput' + Position + '.';
 
-  //name
-  this.Name = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Name', false, Name);
+  if(this.Skill.initialized){
+    initialize();
+  } else {
+    this.Skill.once('init', initialize);
+  }
 
-  // dummy
-  this.Dummy = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy', false, false);
+  function initialize(){
+    //name
+    self.Name = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Name', false, Name);
 
-  // id
-  if(settings.ID)
-    this.ID = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'ID', false, settings.ID);
+    // dummy
+    self.Dummy = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy', false, false);
 
-  // default
-  if(typeof settings.Default != 'undefined')
-    this.Default = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Default', false, settings.Default);
+    // id
+    if(settings.ID)
+      self.ID = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'ID', false, settings.ID);
 
-  // required
-  this.Required = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Required', false, false);
-  if(typeof settings.Required != 'undefined' && settings.Required === false)
-    this.Required.write(settings.Required);
+    // default
+    if(typeof settings.Default != 'undefined')
+      self.Default = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Default', false, settings.Default);
 
-  // maxvalue
-  if(settings.MaxValue)
-    this.MaxValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'MaxValue', false, settings.MaxValue);
+    // required
+    self.Required = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Required', false, false);
+    if(typeof settings.Required != 'undefined' && settings.Required === false)
+      this.Required.write(settings.Required);
 
-  // minvalue
-  if(settings.MinValue)
-    this.MinValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'MinValue', false, settings.MinValue);
+    // maxvalue
+    if(settings.MaxValue)
+      self.MaxValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'MaxValue', false, settings.MaxValue);
 
-  // unit
-  if(settings.Unit)
-    this.Unit = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Unit', false, settings.Unit);
+    // minvalue
+    if(settings.MinValue)
+      self.MinValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'MinValue', false, settings.MinValue);
 
-  // input
-  this.StringValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdInput + 'StringValue', true);
-  this.StringValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdInput + 'Value', true);
+    // unit
+    if(settings.Unit)
+      self.Unit = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdOutput + 'Unit', false, settings.Unit);
+
+    // input
+    self.StringValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdInput + 'StringValue', true);
+    self.StringValue = new OpcuaVariable(Skill.Mi5Module.opcuaClient, baseNodeIdInput + 'Value', true);
+
+    self.initialized = true;
+    self.emit('init');
+  }
 }
 
 module.exports = Parameter;

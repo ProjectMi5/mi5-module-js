@@ -50,7 +50,7 @@ function Mi5Module(trivialName, settings){
   // else
   this.simulateBehaviour = settings.simulateBehaviour;
   this.behaviour = settings.behaviour;
-  this.init = false;
+  this.initialized = false;
   this.numberOfSkills = 0;
 
   // functions
@@ -151,22 +151,16 @@ function Mi5Module(trivialName, settings){
     if(item.numberOfConnections == 0){
       self.log('All connections established successfully.');
       self.emit('connect');
-      self.init = true;
+      self.initialized = true;
     }
   }
 }
 
 Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, SkillId, settings){
   var self = this;
-  if(self.init)
-    append();
-  else
-    self.once('connect', append);
-
-  function append(){
-    var skill = new mi5Skill(SkillNumber, SkillName, SkillId, self, settings);
-    this[SkillName] = skill
-  }
+  var skill = new mi5Skill(SkillNumber, SkillName, SkillId, self, settings);
+  this[SkillName] = skill;
+  return skill;
 };
 
 Mi5Module.prototype.log = function(message){

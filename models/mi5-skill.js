@@ -12,6 +12,7 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
   this.debug('initializing. SkillNumber: '+ SkillNumber + ' SkillID: ' + SkillID);
   EventEmitter.call(this);
   var self = this;
+  this.initialized = false;
   this.SkillNumber = SkillNumber;
   this.SkillName = SkillName;
   this.SkillID = SkillID;
@@ -57,70 +58,86 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
 	var baseNodeIdOutput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Output.SkillOutput.SkillOutput' + SkillNumber + '.';
   this.baseNodeIdOutput = baseNodeIdOutput;
 
-  // adding skill to opcua server
-  if(SkillID){
-    this.SkillIDVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID', false, SkillID);
-    this.SkillDummyValue = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy', false, false);
-    this.SkillNameVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name', false, SkillName);
+  // check for mi5 module to be initialized
+  if(Mi5Module.initialized){
+    initialize();
   } else {
-    console.error('This Skill needs an ID.');
+    Mi5Module.once('connect', initialize);
   }
 
-  // adding skill state variables
-	this.execute	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdInput + 'Execute');
-	this.ready	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Ready');
-	this.busy	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Busy');
-	this.done	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Done');
-	this.error    =  new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Error');
+  function initialize(){
+    // adding skill to opcua server
+    if(SkillID){
+      self.SkillIDVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'ID', false, SkillID);
+      self.SkillDummyValue = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Dummy', false, false);
+      self.SkillNameVariable = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Name', false, SkillName);
+    } else {
+      console.error('This Skill needs an ID.');
+    }
 
-  // adding parameters
-  if(settings.parameters){
-    self.parameter = {};
-    settings.parameters.forEach(function(item, index, array){
-      if(item.Position)
-        index = item.Position;
-      self.parameter[item.Name] = new SkillParameter(index, item.Name, self, item.settings);
-    });
-  }
+    // adding skill state variables
+    self.execute	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdInput + 'Execute');
+    self.ready	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Ready');
+    self.busy	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Busy');
+    self.done	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Done');
+    self.error    =  new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Error');
 
+    // adding parameters
+    if(settings.parameters){
+      self.parameter = {};
+      settings.parameters.forEach(function(item, index, array){
+        if(item.Position)
+          index = item.Position;
+        self.parameter[item.Name] = new SkillParameter(index, item.Name, self, item.settings);
+      });
+    }
 
-  // implement behaviour
-  if(this.behaviour.simulate){
     self.execute.onChange(function(value){
       self.log('execute ' + value);
-
-      if(value){
-        self.simulateBehaviour(self.behaviour.timers, self.behaviour.doneEvent);
-      }
+      self.emit('execute', value);
     });
 
-    self.error.onChange(function(value){
-      self.log('error ' + value);
-      self.setError(value);
-    });
-  }
 
-  if(this.behaviour.listenToMqttTopic){
-    Mi5Module.mqttClient.subscribe(self.behaviour.listenToMqttTopic);
-    self.mqttSensor = false;
-    Mi5Module.mqttClient.on('message', function (topic, message) {
-      // message is Buffer
-      if(topic != self.behaviour.listenToMqttTopic)
-        return;
-      message = message.toString();
-      self.log('sensor says: '+message);
-      var newValue = JSON.parse(message);
-      if(self.mqttSensor != newValue){
-        self.log('new value');
-        if(newValue){
-          self.emit('mqttSensorTurnedTrue');
-        } else {
-          self.emit('mqttSensorTurnedFalse');
+    // implement behaviour
+    if(self.behaviour.simulate){
+      self.execute.onChange(function(value){
+        if(value){
+          self.simulateBehaviour(self.behaviour.timers, self.behaviour.doneEvent);
         }
-      }
-      self.sensor = newValue;
-    });
+      });
+
+      self.error.onChange(function(value){
+        self.log('error ' + value);
+        self.setError(value);
+      });
+    }
+
+    if(self.behaviour.listenToMqttTopic){
+      Mi5Module.mqttClient.subscribe(self.behaviour.listenToMqttTopic);
+      self.mqttSensor = false;
+      Mi5Module.mqttClient.on('message', function (topic, message) {
+        // message is Buffer
+        if(topic != self.behaviour.listenToMqttTopic)
+          return;
+        message = message.toString();
+        self.log('sensor says: '+message);
+        var newValue = JSON.parse(message);
+        if(self.mqttSensor != newValue){
+          self.log('new value');
+          if(newValue){
+            self.emit('mqttSensorTurnedTrue');
+          } else {
+            self.emit('mqttSensorTurnedFalse');
+          }
+        }
+        self.sensor = newValue;
+      });
+    }
+
+    self.initialized = true;
+    self.emit('init');
   }
+
 }
 
 Skill.prototype.simulateBehaviour = function(timers, doneEvent){
@@ -171,6 +188,7 @@ Skill.prototype.log = function(message){
 Skill.prototype.setBusy = function(){
   var self = this;
   self.log('set busy.');
+  self.emit('busy');
   self.done.write(false);
   self.busy.write(true);
   self.ready.write(false);
@@ -181,6 +199,7 @@ Skill.prototype.setBusy = function(){
 
 Skill.prototype.finishTask = function(){
   var self = this;
+  self.emit('finished task');
   self.log('finished its task.');
   self.busy.write(false);
   //writeToIndPhysix("status_self.busy","FALSE");
@@ -189,6 +208,7 @@ Skill.prototype.finishTask = function(){
 Skill.prototype.setDone = function(){
   var self = this;
   self.log('set done.');
+  self.emit('done');
   self.done.write(true);
   //writeToIndPhysix("status_self.done","TRUE");
 };
@@ -207,6 +227,7 @@ Skill.prototype.setReadyWhenExecuteIsReset = function(){
 Skill.prototype.setReady = function(){
   var self = this;
   self.log('set ready.');
+  self.emit('ready');
   self.busy.write(false);
   self.ready.write(true);
   self.done.write(false);
@@ -225,14 +246,14 @@ Skill.prototype.setError = function(value){
   }
 };
 
-Skill.prototype.setError = function(value){
+Skill.prototype.addParameter = function(index, name, settings){
   var self = this;
-  if(value){
-    //writeToIndPhysix("status_self.error","TRUE");
+  var parameter = new SkillParameter(index, name, self, settings);
+  if(!self.parameter){
+    self.parameter = {};
   }
-  else {
-    //writeToIndPhysix("status_self.error","FALSE");
-  }
+  self.parameter[item.Name] = parameter;
+  return parameter;
 };
 
 /*function writeToIndPhysix(variableName,value){
