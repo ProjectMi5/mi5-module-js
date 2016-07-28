@@ -244,9 +244,13 @@ Skill.prototype.setReady = function(){
 Skill.prototype.setError = function(value){
   var self = this;
   if(value){
+    self.emit('error');
+    self.error.write(true);
+    self.ready.write(false);
     //writeToIndPhysix("status_self.error","TRUE");
   }
   else {
+    self.error.write(false);
     //writeToIndPhysix("status_self.error","FALSE");
   }
 };
