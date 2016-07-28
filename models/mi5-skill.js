@@ -86,6 +86,7 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
     }
 
     // adding skill state variables
+    self.activated = new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Activated');
     self.execute	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdInput + 'Execute');
     self.ready	 =	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Ready');
     self.busy	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Busy');
