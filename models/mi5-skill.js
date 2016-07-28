@@ -58,6 +58,16 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
 	var baseNodeIdOutput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Output.SkillOutput.SkillOutput' + SkillNumber + '.';
   this.baseNodeIdOutput = baseNodeIdOutput;
 
+  // adding parameters
+  if(settings.parameters){
+    self.parameter = {};
+    settings.parameters.forEach(function(item, index, array){
+      if(item.Position)
+        index = item.Position;
+      self.parameter[item.Name] = new SkillParameter(index, item.Name, self, item.settings); // new SkillParameter will listen to this.emit('init')
+    });
+  }
+
   // check for mi5 module to be initialized
   if(Mi5Module.initialized){
     initialize();
@@ -82,16 +92,7 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
     self.done	 = 	new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Done');
     self.error    =  new OpcuaVariable(Mi5Module.opcuaClient, baseNodeIdOutput + 'Error');
 
-    // adding parameters
-    if(settings.parameters){
-      self.parameter = {};
-      settings.parameters.forEach(function(item, index, array){
-        if(item.Position)
-          index = item.Position;
-        self.parameter[item.Name] = new SkillParameter(index, item.Name, self, item.settings);
-      });
-    }
-
+    // adding execute listener
     self.execute.onChange(function(value){
       self.log('execute ' + value);
       self.emit('execute', value);
@@ -101,7 +102,6 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
         self.emit('executeFalse');
       }
     });
-
 
     // implement behaviour
     if(self.behaviour.simulate){
