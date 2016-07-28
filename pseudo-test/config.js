@@ -1,7 +1,5 @@
 var ModuleID = '1202';
 
-var folderStructure = require('./folderStructure.json');
-
 exports.mqtt = {
 	host: 'tcp://mi5.itq.de',
 	topics: {
@@ -11,19 +9,22 @@ exports.mqtt = {
 };
 
 var valueStatements = [
-{
+// example: 
+/*{
 	path: 'Output.Name',
 	initValue: 'Check Module'
 },
 {
 	path: 'Output.ID',
 	initValue: ModuleID
-}
+}*/
 ];
 
 
 var ServerStructure = {
 	moduleName: 'Module'+ModuleID,
+	outputName: 'Check Module',
+	outputId: ModuleID,
 	serverInfo: {
 		port: 4842, // the port of the listening socket of the server
 		resourcePath: "", // this path will be added to the endpoint resource name
@@ -35,13 +36,7 @@ var ServerStructure = {
 	},
 	rootFolder: "RootFolder",
 	baseNodeId: "ns=4;s=MI5.",
-	content:{} 
-	
-};
-
-ServerStructure.content['Module'+ModuleID] = {
-	type: 'Folder',
-	content: folderStructure
+	content: "default"
 };
 
 exports.ServerStructure = ServerStructure;

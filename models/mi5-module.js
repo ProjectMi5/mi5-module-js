@@ -65,6 +65,32 @@ function Mi5Module(trivialName, settings){
     }
     var serverStructure = opcuaSettings.server;
 
+    // add default server structure
+    if(serverStructure.content === "default"){
+      serverStructure.content = {};
+      serverStructure.content[serverStructure.moduleName] = {
+        type: 'Folder',
+        content: require("./../structure/folderStructure.json")
+      };
+
+      // add default init values
+      if(!opcuaSettings.setInitValues){
+        opcuaSettings.setInitValues = [];
+      }
+      if(opcuaSettings.server.outputName){
+        opcuaSettings.setInitValues.push({
+          path: serverStructure.moduleName+'.Output.Name',
+          initValue: serverStructure.outputName
+        });
+      }
+      if(opcuaSettings.server.outputId){
+        opcuaSettings.setInitValues.push({
+          path: serverStructure.moduleName+'.Output.ID',
+          initValue: serverStructure.outputId
+        });
+      }
+    }
+
     // make host address available for client
     opcuaSettings.hostAddress = "opc.tcp://" + require("os").hostname() + ":" + opcuaSettings.server.serverInfo.port;
 
