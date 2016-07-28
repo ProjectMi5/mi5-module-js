@@ -95,6 +95,11 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
     self.execute.onChange(function(value){
       self.log('execute ' + value);
       self.emit('execute', value);
+      if(value){
+        self.emit('executeTrue');
+      } else {
+        self.emit('executeFalse');
+      }
     });
 
 
@@ -252,7 +257,7 @@ Skill.prototype.addParameter = function(index, name, settings){
   if(!self.parameter){
     self.parameter = {};
   }
-  self.parameter[item.Name] = parameter;
+  self.parameter[name] = parameter;
   return parameter;
 };
 
