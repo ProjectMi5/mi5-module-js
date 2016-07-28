@@ -205,7 +205,7 @@ Skill.prototype.setBusy = function(){
 
 Skill.prototype.finishTask = function(){
   var self = this;
-  self.emit('finished task');
+  self.emit('finish');
   self.log('finished its task.');
   self.busy.write(false);
   //writeToIndPhysix("status_self.busy","FALSE");
