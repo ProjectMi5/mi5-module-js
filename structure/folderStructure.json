@@ -20,7 +20,7 @@
 	  "PositionInput": {
 		"type": "Variable",
 		"dataType": "Double",
-		"initValue": 3000
+		"initValue": 0
 	  },
 	  "SkillInput": {
 		"type": "Folder",
@@ -130,7 +130,7 @@
 	  "PositionOutput": {
 		"type": "Variable",
 		"dataType": "Double",
-		"initValue": "3750"
+		"initValue": "0"
 	  },
 	  "PositionSensor": {
 		"type": "Variable",
