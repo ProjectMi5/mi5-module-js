@@ -257,7 +257,15 @@ Skill.prototype.activate = function(value){
     self.emit('deactivate');
   }
   this.activated.write(value);
-}
+};
+
+Skill.prototype.reset = function(value){
+  this.activate(true);
+  this.setError(false);
+  this.execute.write(false);
+  this.setReady();
+  self.emit('reset');
+};
 
 Skill.prototype.addParameter = function(index, name, settings){
   var self = this;

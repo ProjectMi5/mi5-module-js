@@ -52,6 +52,7 @@ function Mi5Module(trivialName, settings){
   }
 
   item.numberOfConnections = 0;
+  this.skills = [];
   this.trivialName = trivialName;
   this.moduleId = settings.moduleId;
   this.position = -1;
@@ -224,7 +225,15 @@ Mi5Module.prototype.createSkill = function(SkillNumber, SkillName, SkillId, sett
   var self = this;
   var skill = new mi5Skill(SkillNumber, SkillName, SkillId, self, settings);
   this[SkillName] = skill;
+  this.skills.push(SkillName);
   return skill;
+};
+
+Mi5Module.prototype.resetSkills = function(){
+  var self = this;
+  this.skills.forEach(function(skillName){
+    self[skillName].reset();
+  });
 };
 
 Mi5Module.prototype.log = function(message){
