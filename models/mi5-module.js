@@ -36,24 +36,20 @@ function Mi5Module(trivialName, settings){
 
   this.debug = debug(trivialName);
 
-  if(settings.pathToStorage){
-    settings.pathToStorage = settings.pathToStorage.replace('.', process.cwd());
-  } else {
-    settings.pathToStorage = process.cwd() + '/data';
+  if(settings.storage){
+    settings.storage = settings.storage.replace('.', process.cwd());
+    this.storage = require('node-persist');
+    this.storage.initSync({
+      dir: settings.storage,
+      stringify: JSON.stringify,
+      parse: JSON.parse,
+      encoding: 'utf8',
+      logging: false,  // can also be custom logging function
+      continuous: true,
+      interval: false,
+      ttl: false // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
+    })/*.then(function(){self.emit()}, function(){console.log('no success')})*/;
   }
-
-
-  this.storage = require('node-persist');
-  this.storage.initSync({
-    dir: settings.pathToStorage,
-    stringify: JSON.stringify,
-    parse: JSON.parse,
-    encoding: 'utf8',
-    logging: false,  // can also be custom logging function
-    continuous: true,
-    interval: false,
-    ttl: false // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
-  })/*.then(function(){self.emit()}, function(){console.log('no success')})*/;
 
   item.numberOfConnections = 0;
   this.trivialName = trivialName;
@@ -61,8 +57,8 @@ function Mi5Module(trivialName, settings){
   this.position = -1;
   if(typeof settings.position != 'undefined')
     this.position = settings.position;
-  if(self.storage.getItem('position'))
-    this.position = self.storage.getItem('position');
+  if(self.storage && self.storage.getItem(self.moduleName + 'position'))
+    this.position = self.storage.getItem(self.moduleName + 'position');
 
   // opcua
   if(settings.opcua){
@@ -190,7 +186,7 @@ function Mi5Module(trivialName, settings){
         if(settings.positionOffset)
           position += settings.positionOffset;
         self.PositionOutput.write(position);
-        self.storage.setItem('position', position);
+        self.storage.setItem(self.moduleName+'position', position);
       });
 
 
