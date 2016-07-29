@@ -37,6 +37,10 @@ function Mi5Module(trivialName, settings){
   item.numberOfConnections = 0;
   this.trivialName = trivialName;
   this.moduleId = settings.moduleId;
+  this.position = -1;
+  if(typeof settings.position != 'undefined')
+    this.position = settings.position;
+
   // opcua
   if(settings.opcua){
     //baseNodeId handling
@@ -52,8 +56,9 @@ function Mi5Module(trivialName, settings){
     if(endOfBaseNodeId === '.'){
       dot = '';
     }
-    self.baseNodeIdInput = self.baseNodeId + dot + self.moduleName + '.Input.';
-    self.baseNodeIdOutput = self.baseNodeId + dot + self.moduleName + '.Output.';
+    self.baseNodeIdModule = self.baseNodeId + dot + self.moduleName + '.';
+    self.baseNodeIdInput = self.baseNodeIdModule + 'Input.';
+    self.baseNodeIdOutput = self.baseNodeIdModule + 'Output.';
   }
 
   this.opcuaSettings = settings.opcua;
@@ -142,6 +147,28 @@ function Mi5Module(trivialName, settings){
       if(!err){
         newConnectionEstablished();
       }
+      // create variables
+      self.reset = new OpcuaVariable(self.opcuaClient, self.baseNodeIdModule + 'reset');
+      self.ConnectionTestInput = new OpcuaVariable(self.opcuaClient, self.baseNodeIdInput + 'ConnectionTestInput');
+      self.ConnectionTestOutput = new OpcuaVariable(self.opcuaClient, self.baseNodeIdOutput + 'ConnectionTestOutput', false);
+      self.PositionInput = new OpcuaVariable(self.opcuaClient, self.baseNodeIdInput + 'PositionInput');
+      self.PositionOutput = new OpcuaVariable(self.opcuaClient, self.baseNodeIdOutput + 'PositionOutput', false, self.position);
+      // backend logic
+      self.reset.onChange(function(value){
+        if(value){
+          self.emit('reset');
+        }
+      });
+      self.ConnectionTestInput.onChange(function(value){
+        self.ConnectionTestOutput.write(value);
+      });
+      self.PositionInput.onChange(function(value){
+        var position = value;
+        if(settings.positionOffset)
+          position += settings.positionOffset;
+        self.PositionOutput.write(position);
+      });
+
 
     });
   }
