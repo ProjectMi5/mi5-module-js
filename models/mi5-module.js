@@ -13,9 +13,10 @@ var debug = require('debug');
 var OpcuaServer = simpleOpcua.OpcuaServer;
 var OpcuaClient = simpleOpcua.OpcuaClient;
 var OpcuaHelper = simpleOpcua.helper;
+var OpcuaVariable = simpleOpcua.OpcuaVariable;
 
 var mi5Skill = require('./mi5-skill');
-//var OpcuaVariable = simpleOpcua.OpcuaVariable;
+
 
 
 /**Mi5 Module inherits EventEmitter
@@ -26,7 +27,7 @@ var mi5Skill = require('./mi5-skill');
  */
 
 function Mi5Module(trivialName, settings){
-  //console.log(trivialName, 'creating new module');
+  //console.log(trivialName, 'ceating new module');
   EventEmitter.call(this);
   var self = this;
   var item = this;
@@ -37,8 +38,24 @@ function Mi5Module(trivialName, settings){
   this.trivialName = trivialName;
   this.moduleId = settings.moduleId;
   // opcua
-  if(settings.opcua)
-    this.baseNodeId = settings.opcua.baseNodeId;
+  if(settings.opcua){
+    //baseNodeId handling
+    if(settings.opcua.baseNodeId)
+      createNodeIds(settings.opcua.baseNodeId);
+  }
+
+  function createNodeIds(baseNodeId){
+    self.baseNodeId = baseNodeId;
+    // baseNodeId handling
+    var endOfBaseNodeId = self.baseNodeId.split('').pop();
+    var dot = '.';
+    if(endOfBaseNodeId === '.'){
+      dot = '';
+    }
+    self.baseNodeIdInput = self.baseNodeId + dot + self.moduleName + '.Input.';
+    self.baseNodeIdOutput = self.baseNodeId + dot + self.moduleName + '.Output.';
+  }
+
   this.opcuaSettings = settings.opcua;
   this.opcuaServer = createOpcuaServer();
   this.opcuaClient = connectToOpcuaServer();
@@ -95,8 +112,8 @@ function Mi5Module(trivialName, settings){
     opcuaSettings.hostAddress = "opc.tcp://" + require("os").hostname() + ":" + opcuaSettings.server.serverInfo.port;
 
     // adobt baseNodeId and moduleName for skills etc.
-    self.baseNodeId = opcuaSettings.server.baseNodeId;
     self.moduleName = opcuaSettings.server.moduleName;
+    createNodeIds(opcuaSettings.server.baseNodeId);
 
     // finish opcua server structure
     if(typeof opcuaSettings.expandRepeatUnits == 'undefined' || opcuaSettings.expandRepeatUnits == true){

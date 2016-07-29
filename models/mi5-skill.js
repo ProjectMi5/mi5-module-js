@@ -46,16 +46,9 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
   this.behaviour.doneEvent = settings.doneEvent;
   this.behaviour.listenToMqttTopic = settings.listenToMqttTopic;
 
-  //baseNodeId handling
-	var endOfBaseNodeId = Mi5Module.baseNodeId.split('').pop();
-  var dot = '.';
-  if(endOfBaseNodeId === '.'){
-    dot = '';
-  }
-	
-	var baseNodeIdInput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Input.SkillInput.SkillInput' + SkillNumber + '.';
+  var baseNodeIdInput = Mi5Module.baseNodeIdInput + 'SkillInput.SkillInput' + SkillNumber + '.';
   this.baseNodeIdInput = baseNodeIdInput;
-	var baseNodeIdOutput = Mi5Module.baseNodeId + dot + Mi5Module.moduleName + '.Output.SkillOutput.SkillOutput' + SkillNumber + '.';
+	var baseNodeIdOutput = Mi5Module.baseNodeIdOutput +'SkillOutput.SkillOutput' + SkillNumber + '.';
   this.baseNodeIdOutput = baseNodeIdOutput;
 
   // adding parameters
