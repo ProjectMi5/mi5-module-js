@@ -19,6 +19,8 @@ var mi5Skill = require('./mi5-skill');
 
 
 
+
+
 /**Mi5 Module inherits EventEmitter
  *
  * @param moduleName
@@ -34,12 +36,33 @@ function Mi5Module(trivialName, settings){
 
   this.debug = debug(trivialName);
 
+  if(settings.pathToStorage){
+    settings.pathToStorage = settings.pathToStorage.replace('.', process.cwd());
+  } else {
+    settings.pathToStorage = process.cwd() + '/data';
+  }
+
+
+  this.storage = require('node-persist');
+  this.storage.initSync({
+    dir: settings.pathToStorage,
+    stringify: JSON.stringify,
+    parse: JSON.parse,
+    encoding: 'utf8',
+    logging: false,  // can also be custom logging function
+    continuous: true,
+    interval: false,
+    ttl: false // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
+  })/*.then(function(){self.emit()}, function(){console.log('no success')})*/;
+
   item.numberOfConnections = 0;
   this.trivialName = trivialName;
   this.moduleId = settings.moduleId;
   this.position = -1;
   if(typeof settings.position != 'undefined')
     this.position = settings.position;
+  if(self.storage.getItem('position'))
+    this.position = self.storage.getItem('position');
 
   // opcua
   if(settings.opcua){
@@ -167,6 +190,7 @@ function Mi5Module(trivialName, settings){
         if(settings.positionOffset)
           position += settings.positionOffset;
         self.PositionOutput.write(position);
+        self.storage.setItem('position', position);
       });
 
 
