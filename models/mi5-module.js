@@ -57,7 +57,7 @@ function Mi5Module(trivialName, settings){
   this.position = -1;
   if(typeof settings.position != 'undefined')
     this.position = settings.position;
-  if(self.storage)
+  if(self.storage && self.storage.getItem(self.trivialName + ' position'))
     this.position = self.storage.getItem(self.trivialName + ' position');
 
   // opcua
