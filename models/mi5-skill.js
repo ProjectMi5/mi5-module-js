@@ -129,7 +129,7 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
             self.emit('mqttSensorTurnedFalse');
           }
         }
-        self.sensor = newValue;
+        self.mqttSensor = newValue;
       });
     }
 
