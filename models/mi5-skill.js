@@ -191,9 +191,9 @@ Skill.prototype.setBusy = function(){
   self.done.write(false);
   self.busy.write(true);
   self.ready.write(false);
-  self.Mi5Module.writeToIndPhysix("status_busy","TRUE");
-  self.Mi5Module.writeToIndPhysix("status_ready","FALSE");
-  self.Mi5Module.writeToIndPhysix("status_done","FALSE");
+  self.Mi5Module.writeToIndPhysix("state_busy","TRUE");
+  self.Mi5Module.writeToIndPhysix("state_ready","FALSE");
+  self.Mi5Module.writeToIndPhysix("state_done","FALSE");
 };
 
 Skill.prototype.finishTask = function(){
@@ -201,7 +201,7 @@ Skill.prototype.finishTask = function(){
   self.emit('finish');
   self.log('finished its task.');
   self.busy.write(false);
-  self.Mi5Module.writeToIndPhysix("status_busy","FALSE");
+  self.Mi5Module.writeToIndPhysix("state_busy","FALSE");
 };
 
 Skill.prototype.setDone = function(){
@@ -209,7 +209,7 @@ Skill.prototype.setDone = function(){
   self.log('set done.');
   self.emit('done');
   self.done.write(true);
-  self.Mi5Module.writeToIndPhysix("status_done","TRUE");
+  self.Mi5Module.writeToIndPhysix("state_done","TRUE");
 };
 
 Skill.prototype.setReadyWhenExecuteIsReset = function(){
@@ -230,9 +230,9 @@ Skill.prototype.setReady = function(){
   self.busy.write(false);
   self.ready.write(true);
   self.done.write(false);
-  self.Mi5Module.writeToIndPhysix("status_busy","FALSE");
-  self.Mi5Module.writeToIndPhysix("status_ready","TRUE");
-  self.Mi5Module.writeToIndPhysix("status_done","FALSE");
+  self.Mi5Module.writeToIndPhysix("state_busy","FALSE");
+  self.Mi5Module.writeToIndPhysix("state_ready","TRUE");
+  self.Mi5Module.writeToIndPhysix("state_done","FALSE");
 };
 
 Skill.prototype.setError = function(value){
@@ -241,11 +241,11 @@ Skill.prototype.setError = function(value){
     self.emit('error');
     self.error.write(true);
     self.ready.write(false);
-    self.Mi5Module.writeToIndPhysix("status_error","TRUE");
+    self.Mi5Module.writeToIndPhysix("state_error","TRUE");
   }
   else {
     self.error.write(false);
-    self.Mi5Module.writeToIndPhysix("status_error","FALSE");
+    self.Mi5Module.writeToIndPhysix("state_error","FALSE");
   }
 };
 
