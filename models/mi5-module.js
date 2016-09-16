@@ -256,4 +256,15 @@ Mi5Module.prototype.log = function(message){
   this.debug(message);
 };
 
+Mi5Module.prototype.writeToIndPhysix = function(variableName,value){
+  // SkillNumber+1 equals pump number for Cocktail Module
+  var self = this;
+  var indPhysxSettings = this.indPhysxSettings;
+  var indPhysxClient = this.indPhysxClient;
+  if(!indPhysxClient)
+    return;
+  var outputString = 'setIOValue("' + indPhysxSettings.modulePath + '","' + variableName + '","' + value + '");';
+  indPhysxClient.write(outputString);
+};
+
 module.exports = Mi5Module;
