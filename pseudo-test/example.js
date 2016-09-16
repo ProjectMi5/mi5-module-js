@@ -12,6 +12,11 @@ var moduleSettings = {
   opcua: {
     server: config.ServerStructure
   },
+  indPhysx: {
+    host: '127.0.0.1',
+    port: '7771',
+    modulePath: 'something'
+  },
   simulateBehaviour: true,
   behaviour: {
     finishTask: 2000,

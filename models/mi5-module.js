@@ -4,6 +4,7 @@
 
 var simpleOpcua = require('mi5-simple-opcua');
 var mqtt = require('mqtt');
+var net = require('net');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Mi5Module, EventEmitter);
@@ -89,6 +90,7 @@ function Mi5Module(trivialName, settings){
   this.mqttClient = connectToMQTTClient();
   // indPhysx
   this.indPhysxSettings = settings.indPhysx;
+  this.indPhysxClient = connectToIndPhysx();
   // else
   this.simulateBehaviour = settings.simulateBehaviour;
   this.behaviour = settings.behaviour;
@@ -209,6 +211,20 @@ function Mi5Module(trivialName, settings){
     });
     mqttClient.on('error', console.log);
     return mqttClient;
+  }
+
+  function connectToIndPhysx(){
+    if(!self.indPhysxSettings)
+      return null;
+    var indPhysxClient = net.connect({host: self.indPhysxSettings.host, port: self.indPhysxSettings.port}, function(){
+        console.log("Connected to indPhysx server.");
+    });
+    indPhysxClient.on('error', function(exception){
+      console.error("Connection to industrialPhysics: "+exception+"\ntrying to reconnect in 5 sec.");
+      self.indPhysxClient = null;
+      setTimeout(connectToIndPhysx, 5000);
+    });
+    return indPhysxClient;
   }
 
   function newConnectionEstablished(){

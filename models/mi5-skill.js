@@ -191,9 +191,9 @@ Skill.prototype.setBusy = function(){
   self.done.write(false);
   self.busy.write(true);
   self.ready.write(false);
-  /*writeToIndPhysix("status_self.busy","TRUE");
-  writeToIndPhysix("status_self.ready","FALSE");
-  writeToIndPhysix("status_self.done","FALSE");*/
+  self.writeToIndPhysix("status_self.busy","TRUE");
+  self.writeToIndPhysix("status_self.ready","FALSE");
+  self.writeToIndPhysix("status_self.done","FALSE");
 };
 
 Skill.prototype.finishTask = function(){
@@ -201,7 +201,7 @@ Skill.prototype.finishTask = function(){
   self.emit('finish');
   self.log('finished its task.');
   self.busy.write(false);
-  //writeToIndPhysix("status_self.busy","FALSE");
+  self.writeToIndPhysix("status_self.busy","FALSE");
 };
 
 Skill.prototype.setDone = function(){
@@ -209,7 +209,7 @@ Skill.prototype.setDone = function(){
   self.log('set done.');
   self.emit('done');
   self.done.write(true);
-  //writeToIndPhysix("status_self.done","TRUE");
+  self.writeToIndPhysix("status_self.done","TRUE");
 };
 
 Skill.prototype.setReadyWhenExecuteIsReset = function(){
@@ -230,9 +230,9 @@ Skill.prototype.setReady = function(){
   self.busy.write(false);
   self.ready.write(true);
   self.done.write(false);
-  /*writeToIndPhysix("status_self.busy","FALSE");
-  writeToIndPhysix("status_self.ready","TRUE");
-  writeToIndPhysix("status_self.done","FALSE");*/
+  self.writeToIndPhysix("status_self.busy","FALSE");
+  self.writeToIndPhysix("status_self.ready","TRUE");
+  self.writeToIndPhysix("status_self.done","FALSE");
 };
 
 Skill.prototype.setError = function(value){
@@ -241,11 +241,11 @@ Skill.prototype.setError = function(value){
     self.emit('error');
     self.error.write(true);
     self.ready.write(false);
-    //writeToIndPhysix("status_self.error","TRUE");
+    self.writeToIndPhysix("status_self.error","TRUE");
   }
   else {
     self.error.write(false);
-    //writeToIndPhysix("status_self.error","FALSE");
+    self.writeToIndPhysix("status_self.error","FALSE");
   }
 };
 
@@ -277,12 +277,17 @@ Skill.prototype.addParameter = function(index, name, settings){
   return parameter;
 };
 
-/*function writeToIndPhysix(variableName,value){
+Skill.prototype.writeToIndPhysix = function(variableName,value){
   // SkillNumber+1 equals pump number for Cocktail Module
-  var outputString = 'setIOValue("' + indPhysxSkillPath + '","' + variableName + '","' + value + '");';
-  Mi5Module.indPhysxClient.write(outputString);
-  //self.log(outputString);
-}*/
+  var self = this;
+  var indPhysxSettings = this.Mi5Module.indPhysxSettings;
+  var indPhysxClient = this.Mi5Module.indPhysxClient;
+  if(!indPhysxClient)
+    return;
+  var outputString = 'setIOValue("' + indPhysxSettings.modulePath + '","' + variableName + '","' + value + '");';
+  indPhysxClient.write(outputString);
+  self.log(outputString);
+}
 
 module.exports = Skill;
 
