@@ -35,14 +35,14 @@ function Skill(SkillNumber, SkillName, SkillID, Mi5Module, settings){
   // module settings can override default behaviour
   if(Mi5Module.simulateBehaviour)
     this.behaviour.simulate = Mi5Module.simulateBehaviour;
-  if(Mi5Module.timers)
-    this.behaviour.timers = Mi5Module.timers;
+  if(Mi5Module.behaviour)
+    this.behaviour.timers = Mi5Module.behaviour;
 
   // Skill settings can override module settings
   if(typeof settings.simulateBehaviour != 'undefined')
     this.behaviour.simulate = settings.simulateBehaviour;
-  if(settings.timers)
-    this.behaviour.timers = settings.timers;
+  if(settings.behaviour)
+    this.behaviour.timers = settings.behaviour;
   this.behaviour.doneEvent = settings.doneEvent;
   this.behaviour.listenToMqttTopic = settings.listenToMqttTopic;
 
