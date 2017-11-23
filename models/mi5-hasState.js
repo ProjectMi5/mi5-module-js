@@ -78,10 +78,10 @@ const redCluster = [yellowCluster, "Clearing", "Stopped", "Stopping"];
 
 let StateTransitions = {
   Idle: {
-    start: "Starting",
+      start: "Starting"
   },
   Starting: {
-    done: "Running"
+      done: "Running"
   },
   Running: {
     pause: "Pausing",
@@ -89,10 +89,53 @@ let StateTransitions = {
   },
   Pausing: {
     suspend: "Suspending"
+  },
+  Paused: {
+    resume: "Running"
+  },
+  Suspending: {
+    done: "Suspended"
+  },
+  Suspended: {
+    unsuspend: "Unsuspended"
+  },
+  Unsuspended: {
+    done: "Running"
+  },
+  Completing: {
+    done: "Complete"
+  },
+  Complete: {
+    reset: "Resetting"
+  },
+  Aborting: {
+    done: "Aborted"
+  },
+  Aborted: {
+      clear: "Clearing",
+      reset: "Resetting"
+  },
+  Stopping: {
+      done: "Stopped"
+  },
+  Stopped: {
+      reset: "Resetting"
+  },
+  Holding: {
+      done: "Held"
+  },
+  Held: {
+      unhold: "Unholding"
+  },
+  Unholding: {
+      done: "Running"
+  },
+  Clearing: {
+      done: "Stopped"
+  },
+  Resetting: {
+      done: "Idle"
   }
-
-
-
 }
 
 
