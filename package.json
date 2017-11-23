@@ -9,7 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^2.2.0",
-    "mi5-simple-opcua": "git+https://github.com/ProjectMi5/mi5-simple-opcua.git",
+    "mi5-simple-opcua": "git+https://github.com/ProjectMi5/mi5-simple-opcua.git#v1.0.0-alpha",
     "mqtt": "^1.11.0",
     "net": "^1.0.2",
     "node-persist": "0.0.11"
