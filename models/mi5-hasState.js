@@ -71,10 +71,12 @@ const state = {
   }
 };
 
-const whiteCluster = ["Running", "Paused", "Pausing"];
-const transparentCluster = [whiteCluster, "Suspending", "Suspended", "Unsuspending"];
-const yellowCluster = [transparentCluster, "Idle", "Starting", "Completing", "Complete", "Resetting", "Holding", "Held", "Unholding"];
-const redCluster = [yellowCluster, "Clearing", "Stopped", "Stopping"];
+const clusters ={
+  whiteCluster: ["Running", "Paused", "Pausing"],
+  transparentCluster: ["whiteCluster", "Suspending", "Suspended", "Unsuspending"],
+  yellowCluster: ["transparentCluster", "Idle", "Starting", "Completing", "Complete", "Resetting", "Holding", "Held", "Unholding"],
+  redCluster: ["yellowCluster", "Clearing", "Stopped", "Stopping"]
+};
 
 let StateTransitions = {
   Idle: {
@@ -93,6 +95,31 @@ let StateTransitions = {
 
 
 
+};
+
+function addClusterStateTransitions(){
+  for(let key in StateTransitions){
+    // if it is a clusters
+    if(clusters[key])
+      resolveCluster(key, clusters[key]);
+  }
+}
+
+function resolveCluster(clusterName, followUpStates){
+  clusters[clusterName].forEach(function(item){
+    // recursive if the item itself is a clusters
+    if(clusters[item])
+      return resolveCluster(item, followUpStates);
+    // if it is a single state
+    addFollowUpStatesToSingleState(item, followUpStates);
+  });
+}
+
+function addFollowUpStatesToSingleState(state, followUpStates){
+  // add multiple followUpStates to state
+  for(let key in followUpStates){
+    StateTransitions[state] = followUpStates[key];
+  }
 }
 
 
