@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const stateTransitions = require('./ValidStateTransitions');
 
 const state = {
   type: 'Folder',
@@ -71,120 +72,23 @@ const state = {
   }
 };
 
-const clusters ={
-  whiteCluster: ["Running", "Paused", "Pausing"],
-  transparentCluster: ["whiteCluster", "Suspending", "Suspended", "Unsuspending"],
-  yellowCluster: ["transparentCluster", "Idle", "Starting", "Completing", "Complete", "Resetting", "Holding", "Held", "Unholding"],
-  redCluster: ["yellowCluster", "Clearing", "Stopped", "Stopping"]
-};
-
-let StateTransitions = {
-  Idle: {
-    start: "Starting"
-  },
-  Starting: {
-    done: "Running"
-  },
-  Running: {
-    pause: "Pausing",
-    done: "Completing"
-  },
-  Pausing: {
-    suspend: "Suspending"
-  },
-  Paused: {
-    resume: "Running"
-  },
-  Suspending: {
-    done: "Suspended"
-  },
-  Suspended: {
-    unsuspend: "Unsuspended"
-  },
-  Unsuspended: {
-    done: "Running"
-  },
-  Completing: {
-    done: "Complete"
-  },
-  Complete: {
-    reset: "Resetting"
-  },
-  Aborting: {
-    done: "Aborted"
-  },
-  Aborted: {
-    clear: "Clearing",
-    reset: "Resetting"
-  },
-  Stopping: {
-    done: "Stopped"
-  },
-  Stopped: {
-    reset: "Resetting"
-  },
-  Holding: {
-    done: "Held"
-  },
-  Held: {
-    unhold: "Unholding"
-  },
-  Unholding: {
-    done: "Running"
-  },
-  Clearing: {
-    done: "Stopped"
-  },
-  Resetting: {
-    done: "Idle"
-  }
-};
-
-function addClusterStateTransitions(){
-  for(let key in StateTransitions){
-    // if it is a clusters
-    if(clusters[key])
-      resolveCluster(key, clusters[key]);
-  }
-}
-
-function resolveCluster(clusterName, followUpStates){
-  clusters[clusterName].forEach(function(item){
-    // recursive if the item itself is a clusters
-    if(clusters[item])
-      return resolveCluster(item, followUpStates);
-    // if it is a single state
-    addFollowUpStatesToSingleState(item, followUpStates);
-  });
-}
-
-function addFollowUpStatesToSingleState(state, followUpStates){
-  // add multiple followUpStates to state
-  for(let key in followUpStates){
-    StateTransitions[state] = followUpStates[key];
-  }
-}
 
 
-class hasState extends EventEmitter{
-  constructor(){
+
+class hasState extends EventEmitter {
+  constructor(rootFolder, server){
     super();
     this.state = "aborted";
   }
 
-  start(){
-
-    this.on('start', function(){
-
-    });
-    this.emit('start');
-
-
+  done(){
+    this.performTransition("done");
   }
 
-  stop(){
-
+  performTransition(trans){
+    let nextState = stateTransitions[this.state][trans];
+    if(nextState)
+      this.emit(nextState);
+    this.state = nextState;
   }
-
-
 }
