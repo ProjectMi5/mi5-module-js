@@ -1,6 +1,6 @@
 {
   "name": "mi5-module",
-  "version": "1.0.0",
+  "version": "v0.2.0-alpha",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -8,11 +8,11 @@
   "author": "dominik serve",
   "license": "MIT",
   "dependencies": {
-    "debug": "^2.2.0",
-    "mi5-simple-opcua": "git+https://github.com/ProjectMi5/mi5-simple-opcua.git#v1.0.0-alpha",
-    "mqtt": "^1.11.0",
-    "net": "^1.0.2",
-    "node-persist": "0.0.11"
+    "debug": "^3.1.0",
+    "mi5-simple-opcua": "git+https://github.com/ProjectMi5/mi5-simple-opcua.git",
+    "mqtt": "^2.14.0",
+    "net": "*",
+    "node-persist": "^2.1.0"
   },
   "directories": {
     "example": "example",
