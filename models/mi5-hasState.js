@@ -6,7 +6,7 @@ const state = {
     operationalState: {
       type: 'Variable',
       dataType: 'String',
-      initValue: 'Idle'
+      initValue: 'Aborted'
     },
     stateTransition: {
       type: 'Folder',
@@ -80,10 +80,10 @@ const clusters ={
 
 let StateTransitions = {
   Idle: {
-      start: "Starting"
+    start: "Starting"
   },
   Starting: {
-      done: "Running"
+    done: "Running"
   },
   Running: {
     pause: "Pausing",
@@ -114,29 +114,29 @@ let StateTransitions = {
     done: "Aborted"
   },
   Aborted: {
-      clear: "Clearing",
-      reset: "Resetting"
+    clear: "Clearing",
+    reset: "Resetting"
   },
   Stopping: {
-      done: "Stopped"
+    done: "Stopped"
   },
   Stopped: {
-      reset: "Resetting"
+    reset: "Resetting"
   },
   Holding: {
-      done: "Held"
+    done: "Held"
   },
   Held: {
-      unhold: "Unholding"
+    unhold: "Unholding"
   },
   Unholding: {
-      done: "Running"
+    done: "Running"
   },
   Clearing: {
-      done: "Stopped"
+    done: "Stopped"
   },
   Resetting: {
-      done: "Idle"
+    done: "Idle"
   }
 };
 
