@@ -76,9 +76,13 @@ const state = {
 
 
 class hasState extends EventEmitter {
-  constructor(rootFolder, server){
+  constructor(){
     super();
     this.state = "aborted";
+  }
+
+  addStatesToServer(rootFolder, server){
+
   }
 
   done(){
