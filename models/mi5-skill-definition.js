@@ -13,6 +13,7 @@ class Skill extends hasState {
      * @param {any} [InitState]
      */
     constructor(Module, SkillName = 'defaultSkill'+id++, InputParameter = {}, OutputParameter = {}, InitState = 'Aborted') {
+        super();
         this.SkillName = SkillName;
         this.InputParameter = InputParameter;
         this.OutputParameter = OutputParameter;

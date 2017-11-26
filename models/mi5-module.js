@@ -29,37 +29,23 @@ class Mi5Module extends hasState{
     super();
     let self = this;
     this.name = name;
-    this.server = new OpcuaServer();
+    this.server = new OpcuaServer(settings.port);
     let newStructure = {};
     newStructure[name] = defaultStructure;
+    self.server.start();
+    self.once('init', ()=>{
+      //self.server.start();
+    });
     this.server.once('init', function(){
       newStructure = self.server.addStructure(self.server.structure.baseNodeId,'RootFolder', newStructure);
-      self.rootFolder = newStructure.nodeId;
-
-      self.variables = self.getVariablesFromStructure(newStructure, self.server);
-      //console.log(newStructure);
+      //self.skillsFolder = newStructure[]
+      self.structure = self.getVariablesFromStructure(newStructure, self.server);
+      self.rootFolder = self.structure[name].nodeId;
+      self.stateFolder = self.structure[name]['state'].nodeId;
+      console.log(self.structure);
+      self.addStatesToServer(self.stateFolder, self.server);
+      self.emit('init');
     });
-  }
-
-  /**
-   * helper function
-   * @param structure
-   * @param server
-   * @returns {{}}
-   * @private
-   */
-  getVariablesFromStructure(structure, server){
-    let newStructure = {};
-    for(let key in structure){
-      if(structure[key].type === 'Variable'){
-        newStructure[key] = server.getVariable(structure[key].nodeId);
-      } else if (!structure[key].content){
-        break;
-      } else {
-        newStructure[key] = _getVariablesFromStructure(structure[key].content, server);
-      }
-    }
-    return newStructure;
   }
 }
 module.exports = Mi5Module;

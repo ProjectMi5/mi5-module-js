@@ -1,9 +1,7 @@
 const EventEmitter = require('events');
 const stateTransitions = require('./ValidStateTransitions');
 
-const state = {
-  type: 'Folder',
-  content: {
+const stateStructure = {
     operationalState: {
       type: 'Variable',
       dataType: 'String',
@@ -66,23 +64,46 @@ const state = {
           type: 'Variable',
           dataType: 'Boolean',
           initValue: false
+        },
+        done: {
+          type: 'Variable',
+          dataType: 'Boolean',
+          initValue: false
         }
       }
     }
-  }
-};
-
-
+  };
 
 
 class hasState extends EventEmitter {
   constructor(){
     super();
-    this.state = "aborted";
+    this.state = "Aborted";
   }
 
-  addStatesToServer(rootFolder, server){
+  addStatesToServer(rootNodeId, server){
+    let self = this;
+    this.server = server;
+    server.addStructure(rootNodeId, rootNodeId, stateStructure);
+    this.stateVariables = this.getVariablesFromStructure(stateStructure, server);
+    for(let key in this.stateVariables.stateTransition){
+      if(key === 'nodeId')
+        break;
+      console.log(key);
+      self.stateVariables.stateTransition[key].onChange((value)=>{
+        if(value){
+          console.log('State Transition: '+key+' '+value);
+          //console.log('next state: '+stateTransitions[this.state]);
+          self.performTransition(key);
+        }
+      });
+      //self.stateVariables.stateTransition[key].writeValue(false);
+      //if(stateTransitions[this.state][key]){
+        //if(stateTransitions[this.state][key])
+          //this.stateVariables.stateTransition[key].setValue(stateTransitions[this.state][key]);
 
+
+    }
   }
 
   done(){
@@ -90,9 +111,43 @@ class hasState extends EventEmitter {
   }
 
   performTransition(trans){
+    if(!stateTransitions[this.state])
+      return;
     let nextState = stateTransitions[this.state][trans];
-    if(nextState)
-      this.emit(nextState);
-    this.state = nextState;
+
+    if(nextState){
+      if(nextState)
+        this.emit(nextState);
+      this.stateVariables.operationalState.setValue(nextState);
+      this.state = nextState;
+    }
+
+  }
+
+  /**
+   * helper function
+   * @param structure
+   * @param server
+   * @returns {{}}
+   * @private
+   */
+  getVariablesFromStructure(structure, server){
+    let newStructure = {};
+    let self = this;
+    for(let key in structure){
+      if(!structure.hasOwnProperty(key))
+        break;
+      if(structure[key].type === 'Variable'){
+        newStructure[key] = server.getVariable(structure[key].nodeId);
+      } else if (!structure[key].content){
+        newStructure[key] = {};
+      } else {
+        newStructure[key] = self.getVariablesFromStructure(structure[key].content, server);
+      }
+      newStructure[key].nodeId = structure[key].nodeId;
+    }
+    return newStructure;
   }
 }
+
+module.exports = hasState;
