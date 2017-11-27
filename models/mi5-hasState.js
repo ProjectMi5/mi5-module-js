@@ -1,4 +1,4 @@
-const EventEmitter = require('events');
+const EventEmitter = require('eventemitter2');
 const stateTransitions = require('./ValidStateTransitions').stateTransitions;
 const stateStructure = require('./ServerStructure').stateStructure;
 const initialState = require('./ValidStateTransitions').initialState;
@@ -8,7 +8,14 @@ const pathToOperationalState = require('./ServerStructure').pathToOperationalSta
 
 class hasState extends EventEmitter {
   constructor(keysToBeReplaced){
-    super();
+    // using eventemitter2 because of wildcards
+    super({
+      wildcard: true,
+      delimiter: ':',
+      newListener: false,
+      maxListeners: 20,
+      verboseMemoryLeak: true
+    });
     this.state = initialState;
     this.keysToBeReplaced = keysToBeReplaced || {};
     this.stateStructure = this.replaceKeys(stateStructure, this.keysToBeReplaced);
