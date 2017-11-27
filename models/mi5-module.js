@@ -7,7 +7,7 @@ const simpleOpcua = require('mi5-simple-opcua');
 const debug = require('debug');
 
 const OpcuaServer = simpleOpcua.OpcuaServer;
-const mi5Skill = require('./mi5-skill-definition');
+const mi5Skill = require('./mi5-skill');
 const hasState = require('./mi5-hasState');
 
 const serverStructure = require('./ServerStructure');
