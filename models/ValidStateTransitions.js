@@ -1,4 +1,4 @@
-const clusters ={
+const clusters = {
   whiteCluster: ["Running", "Paused", "Pausing"],
   transparentCluster: ["whiteCluster", "Suspending", "Suspended", "Unsuspending"],
   yellowCluster: ["transparentCluster", "Idle", "Starting", "Completing", "Complete", "Resetting", "Holding", "Held", "Unholding"],
@@ -31,7 +31,7 @@ let StateTransitions = {
   Unsuspended: {
     done: "Running"
   },
-  Unsuspending:{
+  Unsuspending: {
     suspend: "Suspended"
   },
   Completing: {
@@ -68,47 +68,47 @@ let StateTransitions = {
   Resetting: {
     done: "Idle"
   },
-  whiteCluster:{
+  whiteCluster: {
     suspend: "Suspending"
   },
-  transparentCluster:{
+  transparentCluster: {
     hold: "Holding"
   },
-  yellowCluster:{
+  yellowCluster: {
     stop: "Stopping"
   },
-  redCluster:{
+  redCluster: {
     abort: "Aborting"
   }
 
 };
 
-function addClusterStateTransitions(){
-  for(let key in StateTransitions){
+function addClusterStateTransitions() {
+  for (let key in StateTransitions) {
     //console.log(key);
     // if it is a cluster
-    if(clusters[key])
+    if (clusters[key])
       resolveCluster(key, StateTransitions[key]);
   }
 }
 
-function resolveCluster(clusterName, followUpStates){
-  clusters[clusterName].forEach(function(item){
+function resolveCluster(clusterName, followUpStates) {
+  clusters[clusterName].forEach(function (item) {
     // recursive if the item itself is a clusters
-    if(clusters[item])
+    if (clusters[item])
       return resolveCluster(item, followUpStates);
     // if it is a single state
     addFollowUpStatesToSingleState(item, followUpStates);
   });
 }
 
-function addFollowUpStatesToSingleState(state, followUpStates){
+function addFollowUpStatesToSingleState(state, followUpStates) {
   // add multiple followUpStates to state
-  for(let key in followUpStates){
-    if(followUpStates.hasOwnProperty(key))
-      if(!StateTransitions[state])
-        return new Error("Probable typo: "+state+" is not defined in StateTransitions.");
-      StateTransitions[state][key] = followUpStates[key];
+  for (let key in followUpStates) {
+    if (followUpStates.hasOwnProperty(key))
+      if (!StateTransitions[state])
+        return new Error("Probable typo: " + state + " is not defined in StateTransitions.");
+    StateTransitions[state][key] = followUpStates[key];
   }
 }
 

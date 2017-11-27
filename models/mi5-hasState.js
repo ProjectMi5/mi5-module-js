@@ -37,8 +37,6 @@ class hasState extends EventEmitter {
       //if(stateTransitions[this.state][key]){
         //if(stateTransitions[this.state][key])
           //this.stateVariables.stateTransition[key].setValue(stateTransitions[this.state][key]);
-
-
     }
   }
 
@@ -57,7 +55,6 @@ class hasState extends EventEmitter {
       this.getElement(this.stateVariables, pathToOperationalState).setValue(nextState);
       this.state = nextState;
     }
-
   }
 
   /**

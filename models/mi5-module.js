@@ -22,7 +22,7 @@ const pathToModuleStateVariables = serverStructure.pathToModuleStateVariables;
 let servers = {};
 
 
-class Mi5Module extends hasState{
+class Mi5Module extends hasState {
   /**
    * Constructor of a module. A module at least needs a name.
    * @param moduleName
@@ -31,9 +31,9 @@ class Mi5Module extends hasState{
    * @param [settings.port] server port
    * @param [settings.serverSettings] server settings. see [node-opcua documentation]{@link http://node-opcua.github.io/api_doc/classes/OPCUAServer.html}
    */
-  constructor(moduleName, moduleId, settings){
+  constructor(moduleName, moduleId, settings) {
     // with replacements the placeholder keys in the serverstructure will be replaced
-    let replacements = [{key: "$(moduleName)", replacement: moduleName},{key: "$(moduleId)", replacement: moduleId}];
+    let replacements = [{key: "$(moduleName)", replacement: moduleName}, {key: "$(moduleId)", replacement: moduleId}];
     // instantiate the hasState superclass
     super(replacements);
 
@@ -49,7 +49,7 @@ class Mi5Module extends hasState{
     // create and start server if it does not already exist
     settings = settings || {};
     settings.port = settings.port || 4840;
-    if(servers[settings.port])
+    if (servers[settings.port])
       this.server = servers[settings.port];
     else {
       this.server = new OpcuaServer(settings.port, {}, settings.serverSettings);
@@ -58,7 +58,7 @@ class Mi5Module extends hasState{
 
     // fill server with life
     let newStructure = this.replaceKeys(defaultStructure, replacements);
-    this.server.once('init', ()=>{
+    this.server.once('init', () => {
       // server.addStructure annotates the structure with nodeIds etc.
       newStructure = self.server.addStructure(self.server.structure.baseNodeId, baseNode, newStructure);
       // this.getVariablesFromStructure reduces the structure to the necessary elements
@@ -75,4 +75,5 @@ class Mi5Module extends hasState{
     });
   }
 }
+
 module.exports = Mi5Module;
