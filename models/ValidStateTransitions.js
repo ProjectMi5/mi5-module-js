@@ -85,7 +85,7 @@ let StateTransitions = {
 
 function addClusterStateTransitions(){
   for(let key in StateTransitions){
-    console.log(key);
+    //console.log(key);
     // if it is a cluster
     if(clusters[key])
       resolveCluster(key, StateTransitions[key]);
@@ -113,4 +113,5 @@ function addFollowUpStatesToSingleState(state, followUpStates){
 }
 
 addClusterStateTransitions();
-module.exports = StateTransitions;
+exports.stateTransitions = StateTransitions;
+exports.initialState = "Aborted";

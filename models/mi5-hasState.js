@@ -1,101 +1,37 @@
 const EventEmitter = require('events');
-const stateTransitions = require('./ValidStateTransitions');
-
-const stateStructure = {
-    operationalState: {
-      type: 'Variable',
-      dataType: 'String',
-      initValue: 'Aborted'
-    },
-    stateTransition: {
-      type: 'Folder',
-      content: {
-        start: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        pause: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        resume: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        suspend: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        unsuspend: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        hold: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        unhold: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        stop: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        abort: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        clear: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        reset: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        },
-        done: {
-          type: 'Variable',
-          dataType: 'Boolean',
-          initValue: false
-        }
-      }
-    }
-  };
+const stateTransitions = require('./ValidStateTransitions').stateTransitions;
+const stateStructure = require('./ServerStructure').stateStructure;
+const initialState = require('./ValidStateTransitions').initialState;
+const pathToStateTransitions = require('./ServerStructure').pathToStateTransitions;
+const pathToOperationalState = require('./ServerStructure').pathToOperationalState;
 
 
 class hasState extends EventEmitter {
-  constructor(){
+  constructor(keysToBeReplaced){
     super();
-    this.state = "Aborted";
+    this.state = initialState;
+    this.keysToBeReplaced = keysToBeReplaced || {};
+    this.stateStructure = this.replaceKeys(stateStructure, this.keysToBeReplaced);
   }
 
   addStatesToServer(rootNodeId, server){
     let self = this;
     this.server = server;
-    server.addStructure(rootNodeId, rootNodeId, stateStructure);
-    this.stateVariables = this.getVariablesFromStructure(stateStructure, server);
-    for(let key in this.stateVariables.stateTransition){
+
+    this.stateStructure = server.addStructure(rootNodeId, rootNodeId, this.stateStructure);
+    this.stateVariables = this.getVariablesFromStructure(this.stateStructure, server);
+    let stateTransitions = this.getElement(this.stateVariables, pathToStateTransitions);
+    for(let key in stateTransitions){
       if(key === 'nodeId')
         break;
-      console.log(key);
-      self.stateVariables.stateTransition[key].onChange((value)=>{
+      //console.log(key);
+      stateTransitions[key].onChange((value)=>{
         if(value){
           console.log('State Transition: '+key+' '+value);
           //console.log('next state: '+stateTransitions[this.state]);
           self.performTransition(key);
         }
+        stateTransitions[key].setValue(false);
       });
       //self.stateVariables.stateTransition[key].writeValue(false);
       //if(stateTransitions[this.state][key]){
@@ -118,7 +54,7 @@ class hasState extends EventEmitter {
     if(nextState){
       if(nextState)
         this.emit(nextState);
-      this.stateVariables.operationalState.setValue(nextState);
+      this.getElement(this.stateVariables, pathToOperationalState).setValue(nextState);
       this.state = nextState;
     }
 
@@ -147,6 +83,32 @@ class hasState extends EventEmitter {
       newStructure[key].nodeId = structure[key].nodeId;
     }
     return newStructure;
+  }
+
+  /**
+   * Replaces Keys from objects and replaces them accordingly
+   * @param structure
+   * @param keysToBeReplaced Array like this: [{key: "($moduleName)", replacement: "BlaModule"}, ...]
+   * @returns newStructure
+   */
+  replaceKeys(structure, keysToBeReplaced){
+    let structureString = JSON.stringify(structure);
+    keysToBeReplaced.forEach((item)=>{
+      structureString = structureString.split(item.key).join(item.replacement);
+    });
+    return JSON.parse(structureString);
+  }
+
+  getElement(variableStructure, path){
+    let pathString = path.toString();
+    let substructure = variableStructure;
+    path.forEach((item)=>{
+      substructure = substructure[item];
+      if(typeof substructure === 'undefined'){
+        return new Error("Could not find item "+item+" in path "+pathString);
+      }
+    });
+    return substructure;
   }
 }
 
