@@ -1,5 +1,5 @@
 const Mi5Module = require('./../models/mi5-module');
-let module1 = new Mi5Module('module1',{port: 4841});
+let module1 = new Mi5Module('module1',undefined, {port: 4841});
 let skill1 = module1.addSkill('skill1');
 let param1 = skill1.addInputParameter("distance", "Double", 2);
 let param2 = skill1.addInputParameter("height", "Double", 2);
