@@ -15,6 +15,9 @@ If you want to change the server structure, you are free to do so. Documentation
 
 ## Installation
 
+You may have a look at the [mi5-module-js-example](https://github.com/ProjectMi5/mi5-module-js-example) project in
+order to get started. General usage of this module is described here:
+
 1. Install  [Node.js](https://nodejs.org/) version >= v8.9.1.
 2. Create a new folder for your project.
 3. Navigate to this folder in the command prompt.
