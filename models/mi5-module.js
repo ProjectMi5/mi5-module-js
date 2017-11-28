@@ -56,7 +56,7 @@ class Mi5Module extends hasState {
       this.server = servers[settings.port];
     else {
       this.server = new OpcuaServer(settings.port, {}, settings.serverSettings);
-      self.server.start();
+      //self.server.start();
     }
 
     // fill server with life
