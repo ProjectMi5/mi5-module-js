@@ -1,6 +1,7 @@
 // JavaScript source code
 
 const hasState = require('./mi5-hasState');
+const variable = require('./mi5-module-variable');
 
 const ServerStructure = require("./ServerStructure");
 const skillStructure = ServerStructure.skillStructure;
@@ -19,14 +20,18 @@ class Skill extends hasState {
    */
   constructor(module, skillName, skillId) {
     let replacements = module.replacements;
-    replacements.push({key: "$(skillName)", skillName});
-    replacements.push({key: "$(skillId)", skillId});
+    replacements.push({key: "$(skillName)", replacement: skillName});
+    replacements.push({key: "$(skillId)", replacement: skillId});
 
     super(replacements);
 
     this.skillName = skillName;
     this.skillId = skillId;
     this.module = module;
+    this.server = module.server;
+    this.inputParameters = [];
+    this.outputParameters = [];
+    this.initialized = false;
     this.skillStructure = this.replaceKeys(skillStructure, replacements);
     this.pathToSkillStates = this.replaceKeys(pathToSkillStates, replacements);
     this.pathToSkillBaseFolder = this.replaceKeys(pathToSkillBaseFolder, replacements);
@@ -44,18 +49,56 @@ class Skill extends hasState {
 
   init() {
     // add folder structure
-    this.baseFolder = this.getElement(this.module.structure, this.pathToSkillBaseFolder);
-    this.module.server.addStructure(this.baseFolder.nodeId, this.baseFolder.nodeId, this.skillStructure);
+    this.baseFolder = this.getElement(this.module.structure, this.pathToSkillBaseFolder).nodeId;
+    this.structure = this.server.addStructure(this.baseFolder, this.baseFolder, this.skillStructure);
+    this.structure = this.getVariablesFromStructure(this.structure, this.server);
     // add states
-    this.statesFolder = this.getElement(this.baseFolder, this.pathToSkillStates);
-    this.addStatesToServer(this.statesFolder.nodeId, this.module.server);
+    this.statesFolder = this.getElement(this.structure, this.pathToSkillStates);
+    this.addStatesToServer(this.statesFolder.nodeId, this.server);
+    this.initialized = true;
     this.emit('init');
-    this.init = true;
   }
 
-  addInputParameter() {
-
+  /**
+   *
+   * @param {String} name
+   * @param {String} type
+   * @param {String|Number|Boolean} initValue
+   * @param {Array<String>} [path]
+   * @param {String} [nodeId]
+   */
+  addInputParameter(name, type, initValue, path = this.pathToSkillInputParameters, nodeId){
+    let parameter = this.addParameter(name, type, initValue, path, nodeId);
+    this.inputParameters.push(parameter);
+    return parameter;
   }
 
+  /**
+   *
+   * @param {String} name
+   * @param {String} type
+   * @param {String|Number|Boolean} initValue
+   * @param {String} nodeId
+   * @param {Array<String>} [path]
+   * @param {String} [nodeId]
+   */
+  addOutputParameter(name, type, initValue, path = this.pathToSkillOutputParameters, nodeId){
+    let parameter = this.addParameter(name, type, initValue, path, nodeId);
+    this.outputParameters.push(parameter);
+    return parameter;
+  }
 
+  /**
+   *
+   * @param {String} name
+   * @param {String} type
+   * @param {String|Number|Boolean} initValue
+   * @param {Array<String>} path
+   * @param {String} [nodeId]
+   */
+  addParameter(name, type, initValue, path, nodeId){
+    return new variable(this, name, type, initValue, path, nodeId);
+  }
 }
+
+module.exports = Skill;

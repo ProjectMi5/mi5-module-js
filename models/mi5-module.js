@@ -4,6 +4,7 @@
  */
 
 const simpleOpcua = require('mi5-simple-opcua');
+const variable = require('./mi5-module-variable');
 const debug = require('debug');
 
 const OpcuaServer = simpleOpcua.OpcuaServer;
@@ -42,6 +43,8 @@ class Mi5Module extends hasState {
     this.name = moduleName;
     this.id = moduleId;
     this.replacements = replacements;
+    this.skills = [];
+    this.stateVariables = [];
     this.pathToModule = this.replaceKeys(pathToModule, replacements);
     this.pathToModuleStates = this.replaceKeys(pathToModuleStates, replacements);
     this.pathToModuleStateVariables = this.replaceKeys(pathToModuleStateVariables, replacements);
@@ -73,6 +76,26 @@ class Mi5Module extends hasState {
       self.init = true;
       self.emit('init');
     });
+  }
+
+  addSkill(name, id){
+    let skill = new mi5Skill(this, name, id);
+    this.skills.push(skill);
+    return skill;
+  }
+
+  /**
+   *
+   * @param {String} name
+   * @param {String} type
+   * @param {String|Number|Boolean} initValue
+   * @param {Array<String>} path
+   * @param {String} [nodeId]
+   */
+  addStateVariable(name, type, initValue, path = this.pathToModuleStateVariables, nodeId){
+    let varble = new variable(this, name, type, initValue, path, nodeId);
+    this.stateVariables.push(varble);
+    return varble;
   }
 }
 

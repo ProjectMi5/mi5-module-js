@@ -107,9 +107,14 @@ class hasState extends EventEmitter {
     let pathString = path.toString();
     let substructure = variableStructure;
     path.forEach((item)=>{
+      if(typeof substructure === 'undefined'){
+        console.log("item "+item+" path: "+pathString);
+        throw new Error("Could not find item in the path specified by you");
+      }
       substructure = substructure[item];
       if(typeof substructure === 'undefined'){
-        return new Error("Could not find item "+item+" in path "+pathString);
+        console.log("item "+item+" path: "+pathString);
+        throw new Error("Could not find item in the path specified by you");
       }
     });
     return substructure;

@@ -10,12 +10,30 @@ exports.moduleStructure = {
       },
       state: {
         type: 'Folder'
+      },
+      variables: {
+        type: 'Folder'
       }
     }
   }
 };
 
-exports.skillStructure = {};
+exports.skillStructure = {
+  "$(skillName)": {
+    type: 'Folder',
+    content: {
+      state: {
+        type: 'Folder'
+      },
+      inputParameters: {
+        type: 'Folder'
+      },
+      outputParameters: {
+        type: 'Folder'
+      }
+    }
+  }
+};
 
 exports.stateStructure = {
   operationalState: {
@@ -99,11 +117,11 @@ exports.skillParametersStructure = {};
 
 exports.pathToModule = ["$(moduleName)"];
 exports.pathToModuleStates = ["$(moduleName)", "state"];
-exports.pathToModuleStateVariables = [];
+exports.pathToModuleStateVariables = ["$(moduleName)", "variables"];
 exports.pathToSkillsBaseFolder = ["$(moduleName)", "skills"];
-exports.pathToSkillStates = ["$(skillName)", "state"];
-exports.pathToSkillInputParameters = ["$(skillName)", "state"];
-exports.pathToSkillOutputParameters = ["$(skillName)", "state"];
+exports.pathToSkillStates = ["$(skillName)","state"];
+exports.pathToSkillInputParameters = ["$(skillName)","inputParameters"];
+exports.pathToSkillOutputParameters = ["$(skillName)","outputParameters"];
 exports.pathToStateTransitions = ["stateTransition"];
 exports.pathToOperationalState = ["operationalState"];
 
