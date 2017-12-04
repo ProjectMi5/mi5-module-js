@@ -19,7 +19,7 @@ class Skill extends hasState {
    * @param {string|number} skillId
    */
   constructor(module, skillName, skillId) {
-    let replacements = module.replacements;
+    let replacements = JSON.parse(JSON.stringify(module.replacements));
     replacements.push({key: "$(skillName)", replacement: skillName});
     replacements.push({key: "$(skillId)", replacement: skillId});
 
