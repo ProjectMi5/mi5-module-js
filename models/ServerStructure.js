@@ -1,18 +1,23 @@
 exports.baseNode = "RootFolder";
 
 exports.moduleStructure = {
-  "$(moduleName)": {
+  "mi5":{
     type: 'Folder',
     content: {
-      skills: {
+      "$(moduleName)": {
         type: 'Folder',
-        content: {}
-      },
-      state: {
-        type: 'Folder'
-      },
-      variables: {
-        type: 'Folder'
+        content: {
+          skills: {
+            type: 'Folder',
+            content: {}
+          },
+          state: {
+            type: 'Folder'
+          },
+          variables: {
+            type: 'Folder'
+          }
+        }
       }
     }
   }
@@ -115,10 +120,10 @@ exports.skillParametersStructure = {};
 
 exports.skillParametersStructure = {};
 
-exports.pathToModule = ["$(moduleName)"];
-exports.pathToModuleStates = ["$(moduleName)", "state"];
-exports.pathToModuleStateVariables = ["$(moduleName)", "variables"];
-exports.pathToSkillsBaseFolder = ["$(moduleName)", "skills"];
+exports.pathToModule = ["mi5", "$(moduleName)"];
+exports.pathToModuleStates = ["mi5", "$(moduleName)", "state"];
+exports.pathToModuleStateVariables = ["mi5", "$(moduleName)", "variables"];
+exports.pathToSkillsBaseFolder = ["mi5", "$(moduleName)", "skills"];
 exports.pathToSkillStates = ["$(skillName)","state"];
 exports.pathToSkillInputParameters = ["$(skillName)","inputParameters"];
 exports.pathToSkillOutputParameters = ["$(skillName)","outputParameters"];
