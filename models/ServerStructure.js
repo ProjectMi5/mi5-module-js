@@ -7,6 +7,10 @@ exports.moduleStructure = {
       "$(moduleName)": {
         type: 'Folder',
         content: {
+          identification:{
+            type: 'Folder',
+            content: {}
+          },
           skills: {
             type: 'Folder',
             content: {}
@@ -45,6 +49,36 @@ exports.stateStructure = {
     type: 'Variable',
     dataType: 'String',
     initValue: 'Aborted'
+  },
+  errorAcknowledge: {
+    type: 'Variable',
+    dataType: 'Boolean',
+    initValue: false
+  },
+  errorMessage: {
+    type: 'Folder',
+    content: {
+      messageID: {
+        type: 'Variable',
+        dataType: 'Integer',
+        initValue: 0
+      },
+      messageType: {
+        type: 'Variable',
+        dataType: 'String',
+        initValue: ''
+      },
+      messageText: {
+        type: 'Variable',
+        dataType: 'String',
+        initValue: ''
+      },
+      messageTime: {
+        type: 'Variable',
+        dataType: 'String',
+        initValue: ''
+      },
+    }
   },
   stateTransition: {
     type: 'Folder',
@@ -121,6 +155,7 @@ exports.skillParametersStructure = {};
 exports.skillParametersStructure = {};
 
 exports.pathToModule = ["mi5", "$(moduleName)"];
+exports.pathToModuleIdentification = ["mi5", "$(moduleName)", "identification"];
 exports.pathToModuleStates = ["mi5", "$(moduleName)", "state"];
 exports.pathToModuleStateVariables = ["mi5", "$(moduleName)", "variables"];
 exports.pathToSkillsBaseFolder = ["mi5", "$(moduleName)", "skills"];
