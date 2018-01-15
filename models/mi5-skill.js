@@ -99,6 +99,22 @@ class Skill extends hasState {
   addParameter(name, type, initValue, path, nodeId){
     return new variable(this, name, type, initValue, path, nodeId);
   }
+  
+  getOutputParameter(name){
+    for(let i = 0; i<this.outputParameters.length; i++){
+      if(this.outputParameters[i].name === name)
+        return this.outputParameters[i];
+    }
+    return null;
+  }
+
+  getInputParameter(name){
+    for(let i = 0; i<this.inputParameters.length; i++){
+      if(this.inputParameters[i].name === name)
+        return this.inputParameters[i];
+    }
+    return null;
+  }
 }
 
 module.exports = Skill;
