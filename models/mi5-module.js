@@ -98,6 +98,22 @@ class Mi5Module extends hasState {
     this.stateVariables.push(varble);
     return varble;
   }
+
+  getSkill(name){
+    for(let i = 0; i<this.skills.length; i++){
+      if(this.skills[i].name === name)
+        return this.skills[i];
+    }
+    return null;
+  }
+
+  getStateVariable(name){
+    for(let i = 0; i<this.stateVariables.length; i++){
+      if(this.stateVariables[i].name === name)
+        return this.stateVariables[i];
+    }
+    return null;
+  }
 }
 
 module.exports = Mi5Module;
