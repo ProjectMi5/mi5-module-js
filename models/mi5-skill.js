@@ -25,7 +25,7 @@ class Skill extends hasState {
 
     super(replacements);
 
-    this.skillName = skillName;
+    this.name = skillName;
     this.skillId = skillId;
     this.module = module;
     this.server = module.server;
