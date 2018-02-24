@@ -1,14 +1,25 @@
 const EventEmitter = require('eventemitter2');
-const stateTransitions = require('./ValidStateTransitions').stateTransitions;
-const stateStructure = require('./ServerStructure').stateStructure;
-const initialState = require('./ValidStateTransitions').initialState;
-const pathToStateTransitions = require('./ServerStructure').pathToStateTransitions;
-const pathToOperationalState = require('./ServerStructure').pathToOperationalState;
+let defaults = require('./setDefaults');
+let stateDefinition;
+let serverStructure;
+let validStateTransitions;
+let stateStructure;
+let initialState;
+let pathToStateTransitions;
+let pathToOperationalState;
 
 
 class hasState extends EventEmitter {
   constructor(keysToBeReplaced){
     // using eventemitter2 because of wildcards
+    stateDefinition = defaults.ValidStateTransitions;
+    serverStructure = defaults.ServerStructure;
+    validStateTransitions = stateDefinition.stateTransitions;
+    stateStructure = serverStructure.stateStructure;
+    initialState = stateDefinition.initialState;
+    pathToStateTransitions = serverStructure.pathToStateTransitions;
+    pathToOperationalState = serverStructure.pathToOperationalState;
+
     super({
       wildcard: true,
       delimiter: ':',
@@ -52,14 +63,13 @@ class hasState extends EventEmitter {
   }
 
   performTransition(trans){
-    if(!stateTransitions[this.state])
+    if(!validStateTransitions[this.state])
       return;
-    let nextState = stateTransitions[this.state][trans];
+    let nextState = validStateTransitions[this.state][trans];
 
-    if(nextState){
-      if(nextState)
-        this.emit(nextState);
-      this.getElement(this.stateVariables, pathToOperationalState).setValue(nextState);
+    if(typeof nextState !== 'undefined'){
+      this.emit(nextState.toString());
+      this.getElement(this.stateVariables, pathToOperationalState).setValue(nextState.toString());
       this.state = nextState;
     }
   }

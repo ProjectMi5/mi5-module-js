@@ -1,4 +1,6 @@
 const Mi5Module = require('./../models/mi5-module');
+const setDefaults = require('./../models/setDefaults').setDefaults;
+setDefaults("smart4i");
 let module1 = new Mi5Module('module1',undefined, {port: 4841});
 let module2 = new Mi5Module('module2',undefined, {port: 4841});
 let skill1 = module1.addSkill('skill1');

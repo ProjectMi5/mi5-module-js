@@ -1,3 +1,5 @@
+const addClusterStateTransitions = require('../../helpers/resolveClusters');
+
 const clusters = {
   whiteCluster: ["Running", "Paused", "Pausing"],
   transparentCluster: ["whiteCluster", "Suspending", "Suspended", "Unsuspending"],
@@ -83,35 +85,6 @@ let StateTransitions = {
 
 };
 
-function addClusterStateTransitions() {
-  for (let key in StateTransitions) {
-    //console.log(key);
-    // if it is a cluster
-    if (clusters[key])
-      resolveCluster(key, StateTransitions[key]);
-  }
-}
-
-function resolveCluster(clusterName, followUpStates) {
-  clusters[clusterName].forEach(function (item) {
-    // recursive if the item itself is a clusters
-    if (clusters[item])
-      return resolveCluster(item, followUpStates);
-    // if it is a single state
-    addFollowUpStatesToSingleState(item, followUpStates);
-  });
-}
-
-function addFollowUpStatesToSingleState(state, followUpStates) {
-  // add multiple followUpStates to state
-  for (let key in followUpStates) {
-    if (followUpStates.hasOwnProperty(key))
-      if (!StateTransitions[state])
-        return new Error("Probable typo: " + state + " is not defined in StateTransitions.");
-    StateTransitions[state][key] = followUpStates[key];
-  }
-}
-
-addClusterStateTransitions();
+addClusterStateTransitions(StateTransitions, clusters);
 exports.stateTransitions = StateTransitions;
 exports.initialState = "Aborted";

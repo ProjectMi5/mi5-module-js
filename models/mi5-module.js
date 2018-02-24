@@ -11,12 +11,13 @@ const OpcuaServer = simpleOpcua.OpcuaServer;
 const mi5Skill = require('./mi5-skill');
 const hasState = require('./mi5-hasState');
 
-const serverStructure = require('./ServerStructure');
-const defaultStructure = serverStructure.moduleStructure;
-const baseNode = serverStructure.baseNode;
-const pathToModule = serverStructure.pathToModule;
-const pathToModuleStates = serverStructure.pathToModuleStates;
-const pathToModuleStateVariables = serverStructure.pathToModuleStateVariables;
+let defaults = require('./setDefaults');
+let serverStructure;
+let defaultStructure;
+let baseNode;
+let pathToModule;
+let pathToModuleStates;
+let pathToModuleStateVariables;
 
 // each module can have its own server or share one server with others.
 // this is why we save the servers by port:
@@ -35,6 +36,12 @@ class Mi5Module extends hasState {
   constructor(moduleName, moduleId, settings) {
     // with replacements the placeholder keys in the serverstructure will be replaced
     let replacements = [{key: "$(moduleName)", replacement: moduleName}, {key: "$(moduleId)", replacement: moduleId}];
+    serverStructure = defaults.ServerStructure;
+    defaultStructure = serverStructure.moduleStructure;
+    baseNode = serverStructure.baseNode;
+    pathToModule = serverStructure.pathToModule;
+    pathToModuleStates = serverStructure.pathToModuleStates;
+    pathToModuleStateVariables = serverStructure.pathToModuleStateVariables;
     // instantiate the hasState superclass
     super(replacements);
 

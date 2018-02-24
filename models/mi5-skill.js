@@ -3,12 +3,13 @@
 const hasState = require('./mi5-hasState');
 const variable = require('./mi5-module-variable');
 
-const ServerStructure = require("./ServerStructure");
-const skillStructure = ServerStructure.skillStructure;
-const pathToSkillBaseFolder = ServerStructure.pathToSkillsBaseFolder;
-const pathToSkillStates = ServerStructure.pathToSkillStates;
-const pathToSkillOutputParameters = ServerStructure.pathToSkillOutputParameters;
-const pathToSkillInputParameters = ServerStructure.pathToSkillInputParameters;
+let defaults = require("./setDefaults");
+let ServerStructure;
+let skillStructure;
+let pathToSkillBaseFolder;
+let pathToSkillStates;
+let pathToSkillOutputParameters;
+let pathToSkillInputParameters;
 
 
 class Skill extends hasState {
@@ -19,6 +20,13 @@ class Skill extends hasState {
    * @param {string|number} skillId
    */
   constructor(module, skillName, skillId) {
+    ServerStructure = defaults.ServerStructure;
+    skillStructure = ServerStructure.skillStructure;
+    pathToSkillBaseFolder = ServerStructure.pathToSkillsBaseFolder;
+    pathToSkillStates = ServerStructure.pathToSkillStates;
+    pathToSkillOutputParameters = ServerStructure.pathToSkillOutputParameters;
+    pathToSkillInputParameters = ServerStructure.pathToSkillInputParameters;
+
     let replacements = JSON.parse(JSON.stringify(module.replacements));
     replacements.push({key: "$(skillName)", replacement: skillName});
     replacements.push({key: "$(skillId)", replacement: skillId});

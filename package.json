@@ -1,6 +1,6 @@
 {
   "name": "mi5-module",
-  "version": "v0.2.0-alpha",
+  "version": "v0.3.0-alpha",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +13,8 @@
     "mi5-simple-opcua": "git+https://github.com/ProjectMi5/mi5-simple-opcua.git",
     "mqtt": "^2.15.1",
     "net": "*",
-    "node-persist": "^2.1.0"
+    "node-persist": "^2.1.0",
+    "underscore": "^1.8.3"
   },
   "directories": {
     "example": "example",
