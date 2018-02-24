@@ -68,9 +68,9 @@ class hasState extends EventEmitter {
     let nextState = validStateTransitions[this.state][trans];
 
     if(typeof nextState !== 'undefined'){
-      this.emit(nextState.toString());
       this.getElement(this.stateVariables, pathToOperationalState).setValue(nextState.toString());
       this.state = nextState;
+      this.emit(nextState.toString());
     }
   }
 
