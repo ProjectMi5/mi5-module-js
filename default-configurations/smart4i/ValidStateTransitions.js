@@ -10,9 +10,9 @@ const clusters = {
 let StateTransitions = {
   // Idle
   0: {
-    start: "Starting" // Running
+    start: "1" // Running
   },
-  Starting: {
+  1: {
     done: 2 // Running
   },
   // Running
@@ -42,7 +42,7 @@ let StateTransitions = {
   },*/
   // Complete
   12: {
-    reset: "Resetting"
+    reset: 13
   },
   /*
   Aborting: {
@@ -50,15 +50,15 @@ let StateTransitions = {
   },*/
   // Aborted
   17: {
-    clear: "Clearing",
-    reset: "Resetting"
+    clear: 18,
+    reset: 13
   },/*
   Stopping: {
     done: "Stopped"
   },*/
   // Stopped
   15: {
-    reset: "Resetting"
+    reset: 13
   },
   /*
   Holding: {
@@ -70,10 +70,10 @@ let StateTransitions = {
   Unholding: {
     done: "Running"
   },*/
-  Clearing: {
+  18: {
     done: 15 // Stopped
   },
-  Resetting: {
+  13: {
     done: "0" // Idle
   },/*
   whiteCluster: {
