@@ -45,6 +45,11 @@ exports.skillStructure = {
 };
 
 exports.stateStructure = {
+  errorAcknowledge: {
+    type: 'Variable',
+    dataType: 'Boolean',
+    initValue: false
+  },
   stateMachine: {
     type: 'Folder',
     content: {
@@ -52,11 +57,6 @@ exports.stateStructure = {
         type: 'Variable',
         dataType: 'String',
         initValue: '17'
-      },
-      errorAcknowledge: {
-        type: 'Variable',
-        dataType: 'Boolean',
-        initValue: false
       },
       errorMessage: {
         type: 'Folder',
